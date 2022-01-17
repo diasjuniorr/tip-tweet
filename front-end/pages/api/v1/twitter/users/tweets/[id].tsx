@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { http } from "../../../../../../lib/http";
 
+const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN || "";
+
 type ApiResponse = {
   twitterUserName: string;
   twitterUserId: string;
@@ -32,7 +34,7 @@ export default async function handler(
           method: "GET",
           headers: new Headers({
             Authorization:
-              "Bearer AAAAAAAAAAAAAAAAAAAAAC8HYAEAAAAAuVI%2FlDXwPU7SmBNHraQkC5y%2FHcU%3DCiylnmuYijVp7KHxGJ4EsHd1mm8A1JTSanqZuHDar1wkC0CVEs",
+              `Bearer ${TWITTER_BEARER_TOKEN}`,
           }),
         }
       );
