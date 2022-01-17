@@ -1,9 +1,8 @@
 import { MouseEventHandler, useEffect, useState } from "react";
 import type { NextPage } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { User } from "@supabase/supabase-js";
 import supabase from "../lib/supabase";
+import { User } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { http } from "../lib/http";
 
@@ -85,7 +84,6 @@ const Home: NextPage = () => {
       if (contracts) {
         const contract = contracts[0];
         setContractAddress(contract?.address);
-        console.log("contract address", contract.address);
       }
     })
   }, [user]);
