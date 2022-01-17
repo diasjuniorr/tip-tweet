@@ -5,6 +5,9 @@ import supabase from "../lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { http } from "../lib/http";
+import abi from "../contracts/abi/TipTweet.json";
+
+const CONTRACT_ABI = abi;
 
 const Home: NextPage = () => {
   const [tweetUrl, setTweetUrl] = useState("");
@@ -39,8 +42,10 @@ const Home: NextPage = () => {
     setTweetID(tweetID);
 
     //get twiiter user id
-    const tweetOwnerData = await http(`/api/v1/twitter/users/tweets/${tweetID}`);
-    console.log("data", tweetOwnerData)
+    const tweetOwnerData = await http(
+      `/api/v1/twitter/users/tweets/${tweetID}`
+    );
+    console.log("data", tweetOwnerData);
 
     if (!contractAddress) {
       const newContract = await createContract("123123", user as User);
@@ -85,7 +90,7 @@ const Home: NextPage = () => {
         const contract = contracts[0];
         setContractAddress(contract?.address);
       }
-    })
+    });
   }, [user]);
 
   if (!user) {
@@ -99,7 +104,6 @@ const Home: NextPage = () => {
         <h1 className="text-3xl font-semibold text-center text-white">
           Tip a tweet and support the author
         </h1>
-
         <div className="flex flex-col p-6">
           <form className="flex flex-col" onSubmit={handleSubmit}>
             <label htmlFor="tweet" className="text-gray-200">
@@ -160,7 +164,7 @@ const getContract = async () => {
   let { data: contract, error } = await supabase
     .from("contracts")
     .select("*")
-    .eq("active", true)
+    .eq("active", true);
   if (error) console.log("error", error);
 
   return contract;
