@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { http } from "../lib/http";
 import abi from "../contracts/abi/TipTweet.json";
 
-const CONTRACT_ABI = abi;
+const CONTRACT_ABI = abi.abi;
 
 //typescript workaround
 declare let window: any;
@@ -17,7 +17,7 @@ const Home: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [tweetUrl, setTweetUrl] = useState("");
   const [tweetID, setTweetID] = useState("");
-  const [tip, setTip] = useState("");
+  const [tipAmount, setTipAmount] = useState("");
   const [contractAddress, setContractAddress] = useState("");
   const [user, setUser] = useState<User | null>();
 
@@ -79,6 +79,8 @@ const Home: NextPage = () => {
       console.log("created contract", newContract);
     }
 
+    await deployTipContract()
+
     //check if tip amount is valid
     //request GET to /contract
     //returns contract address or 204
@@ -116,7 +118,35 @@ const Home: NextPage = () => {
     }
   };
 
-  // Render Methods
+  const deployTipContract = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!currentAccount) {
+        throw new Error("No account connected");
+      }
+
+      // const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.JsonRpcProvider();
+      const signer = provider.getSigner();
+
+      const factory = new ethers.ContractFactory(
+        CONTRACT_ABI,
+        abi.bytecode,
+        signer
+      );
+
+      const tipTweet = await factory.deploy({
+        value: ethers.utils.parseEther("1"),
+      });
+      await tipTweet.deployed();
+
+      setContractAddress(tipTweet.address);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const renderNotConnectedContainer = () => (
     <div className="flex justify-center">
       <button
@@ -189,8 +219,8 @@ const Home: NextPage = () => {
                 className="py-2 px-4 rounded-md focus:outline-none focus:ring-2"
                 type="text"
                 id="text"
-                value={tip}
-                onChange={(e) => setTip(e.target.value)}
+                value={tipAmount}
+                onChange={(e) => setTipAmount(e.target.value)}
               />
 
               <button
@@ -201,6 +231,12 @@ const Home: NextPage = () => {
               </button>
             </form>
             <div className="text-center text-3xl text-white m-10">OR</div>
+            <button
+              className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+              onClick={()=> console.log("contract address: ", contractAddress)}
+            >
+              Get Contract Address
+            </button>
             <button
               className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
               onClick={handleLogOut}
