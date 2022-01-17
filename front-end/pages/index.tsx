@@ -1,6 +1,7 @@
 import { MouseEventHandler, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import { ethers } from "ethers";
 import supabase from "../lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
