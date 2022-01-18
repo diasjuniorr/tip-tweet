@@ -109,8 +109,8 @@ const Home: NextPage = () => {
         throw new Error("No account connected");
       }
 
-      // const provider = new ethers.providers.Web3Provider(ethereum)
-      const provider = new ethers.providers.JsonRpcProvider();
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
 
       const factory = new ethers.ContractFactory(
@@ -137,8 +137,9 @@ const Home: NextPage = () => {
       if (!currentAccount) {
         throw new Error("No account connected");
       }
-      // const provider = new ethers.providers.Web3Provider(ethereum)
-      const provider = new ethers.providers.JsonRpcProvider();
+      const { ethereum } = window;
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
       const messageHashed = ethers.utils.solidityKeccak256(
         ["string", "uint256", "string", "address"],
