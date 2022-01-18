@@ -4,8 +4,8 @@ import { http } from "../../../../../../lib/http";
 const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN || "";
 
 type ApiResponse = {
-  twitterUserName: string;
-  twitterUserId: string;
+  userName: string;
+  userId: string;
 };
 
 type ApiError = {
@@ -33,19 +33,20 @@ export default async function handler(
         {
           method: "GET",
           headers: new Headers({
-            Authorization:
-              `Bearer ${TWITTER_BEARER_TOKEN}`,
+            Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
           }),
         }
       );
 
-      const twitterUserId = data.includes.users[0].id;
-      const twitterUserName = data.includes.users[0].username;
+      const userId = data.includes.users[0].id;
+      const userName = data.includes.users[0].username;
 
-      return res.status(200).json({ twitterUserId, twitterUserName });
+      return res.status(200).json({ userId, userName });
     } catch (e) {
       console.log("request error", e);
-      return res.status(500).json({ statusCode: 500, details: "internal server error" });
+      return res
+        .status(500)
+        .json({ statusCode: 500, details: "internal server error" });
     }
   }
 
