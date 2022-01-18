@@ -26,7 +26,7 @@ const SignIn = () => {
 
     if (!userAlreadyCreated) {
       const user_id = await createUser(user as User);
-      console.log("user_id", user_id)
+      console.log("user_id", user_id);
 
       return router.push("/");
     }
@@ -71,6 +71,9 @@ const SignIn = () => {
             >
               Sign in with Email
             </button>
+            <div className="mt-3 text-white text-left">
+              <a href="/signup">Need an account? Signup here</a>
+            </div>
           </form>
         </div>
       </div>
@@ -81,7 +84,7 @@ const SignIn = () => {
 export default SignIn;
 
 const getUser = async (user: User) => {
-  const { data:  error } = await supabase
+  const { data: error } = await supabase
     .from("users")
     .select("id")
     .eq("id", user.id);
