@@ -1,7 +1,7 @@
 import { MouseEventHandler, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import supabase from "../lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
@@ -16,12 +16,144 @@ declare let window: any;
 const Home: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [tweetUrl, setTweetUrl] = useState("");
-  const [tweetID, setTweetID] = useState("");
   const [tipAmount, setTipAmount] = useState("");
-  const [contractAddress, setContractAddress] = useState("");
+  const [contract, setContract] = useState<Contract | null>();
   const [user, setUser] = useState<User | null>();
 
   const router = useRouter();
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    try {
+      const tweetID = getTweetID(tweetUrl);
+      if (!tweetID) {
+        alert("Invalid tweet URL");
+        return;
+      }
+
+      //get twiiter user id
+      const tweetOwnerData = await http(
+        `/api/v1/twitter/users/tweets/${tweetID}`
+      );
+      console.log("data", tweetOwnerData);
+      const tweetOwnerId = tweetOwnerData.userId;
+
+      const nonce = generateNonce();
+      const ethAmount = ethers.utils.parseEther(tipAmount);
+
+      //if user does not have a wallet (contract deployed) deploy a new one
+      if (!contract) {
+        console.log("No contract address found");
+        const address = await deployTipContract(ethAmount);
+
+        const newContract = await postContract(address as string, user as User);
+
+        if (!newContract) {
+          throw new Error("Could not post contract");
+        }
+
+        const message = makeNewMessage(
+          ethAmount,
+          tweetID,
+          nonce,
+          newContract.address
+        );
+
+        console.log("message", message);
+        const signature = await signMessage(message);
+
+        //what if saving tip fails?
+        const newTip = await postTip(
+          message,
+          signature as string,
+          tweetOwnerId,
+          newContract,
+          user as User
+        );
+        console.log("newTip", newTip);
+        return;
+      }
+
+      //if user already has a wallet (deployed contract) use it
+      //TODO: transfer founds to user's wallet (deployed contract)
+
+      const message = makeNewMessage(
+        ethAmount,
+        tweetID,
+        nonce,
+        contract.address
+      );
+
+      const signature = await signMessage(message);
+
+      const newTip = await postTip(
+        message,
+        signature as string,
+        tweetOwnerId,
+        contract,
+        user as User
+      );
+      console.log("newTip", newTip);
+      return;
+    } catch (e) {
+      throw new Error("Attempt to tip tweet failed");
+    }
+  }
+
+  const deployTipContract = async (ethAmount: BigNumber) => {
+    try {
+      const { ethereum } = window;
+
+      if (!currentAccount) {
+        throw new Error("No account connected");
+      }
+
+      // const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.JsonRpcProvider();
+      const signer = provider.getSigner();
+
+      const factory = new ethers.ContractFactory(
+        CONTRACT_ABI,
+        abi.bytecode,
+        signer
+      );
+
+      const tipTweet = await factory.deploy({
+        value: ethAmount,
+      });
+      await tipTweet.deployed();
+
+      return tipTweet.address;
+    } catch (err) {
+      console.log(err);
+      throw new Error("Could not deploy contract");
+    }
+  };
+
+  const signMessage = async (message: Message) => {
+    const { ethAmount, tweetID, nonce, contractAddress } = message;
+    try {
+      if (!currentAccount) {
+        throw new Error("No account connected");
+      }
+      // const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.JsonRpcProvider();
+      const signer = provider.getSigner();
+      const messageHashed = ethers.utils.solidityKeccak256(
+        ["string", "uint256", "string", "address"],
+        [tweetID, ethAmount, nonce, contractAddress]
+      );
+
+      const signature = await signer.signMessage(
+        ethers.utils.arrayify(messageHashed)
+      );
+      return signature;
+    } catch (err) {
+      console.log(err);
+      throw new Error("Could not sign message");
+    }
+  };
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -44,60 +176,6 @@ const Home: NextPage = () => {
     }
   };
 
-  const handleLogOut: MouseEventHandler = async (e) => {
-    e.preventDefault();
-
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      alert(JSON.stringify(error));
-    } else {
-      router.push("/signin");
-    }
-  };
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const tweetID = getTweetID(tweetUrl);
-    if (!tweetID) {
-      alert("Invalid tweet URL");
-      return;
-    }
-
-    setTweetID(tweetID);
-
-    //get twiiter user id
-    const tweetOwnerData = await http(
-      `/api/v1/twitter/users/tweets/${tweetID}`
-    );
-    console.log("data", tweetOwnerData);
-
-    if (!contractAddress) {
-      const newContract = await createContract("123123", user as User);
-      setContractAddress(newContract.address);
-      console.log("created contract", newContract);
-    }
-
-    await deployTipContract()
-
-    //check if tip amount is valid
-    //request GET to /contract
-    //returns contract address or 204
-
-    //if contract address is valid
-    //sendTransaction with tip amount to the contract
-
-    //if no contract address returned
-    //deploy a new contract with tip amount
-    //save contract address to the database
-
-    //generate nonce
-    //create message using tweetID, nonce, tip amount and contract address
-    //sign message with private key
-    //save signature to the database and attach a twitter user id to it
-  }
-
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -118,32 +196,15 @@ const Home: NextPage = () => {
     }
   };
 
-  const deployTipContract = async () => {
-    try {
-      const { ethereum } = window;
+  const handleLogOut: MouseEventHandler = async (e) => {
+    e.preventDefault();
 
-      if (!currentAccount) {
-        throw new Error("No account connected");
-      }
+    const { error } = await supabase.auth.signOut();
 
-      // const provider = new ethers.providers.Web3Provider(ethereum)
-      const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner();
-
-      const factory = new ethers.ContractFactory(
-        CONTRACT_ABI,
-        abi.bytecode,
-        signer
-      );
-
-      const tipTweet = await factory.deploy({
-        value: ethers.utils.parseEther("1"),
-      });
-      await tipTweet.deployed();
-
-      setContractAddress(tipTweet.address);
-    } catch (err) {
-      console.log(err);
+    if (error) {
+      alert(JSON.stringify(error));
+    } else {
+      router.push("/signin");
     }
   };
 
@@ -177,10 +238,9 @@ const Home: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    getContract().then((contracts) => {
-      if (contracts) {
-        const contract = contracts[0];
-        setContractAddress(contract?.address);
+    getContract().then((contract) => {
+      if (contract) {
+        setContract(contract);
       }
     });
   }, [user]);
@@ -233,12 +293,6 @@ const Home: NextPage = () => {
             <div className="text-center text-3xl text-white m-10">OR</div>
             <button
               className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-              onClick={()=> console.log("contract address: ", contractAddress)}
-            >
-              Get Contract Address
-            </button>
-            <button
-              className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
               onClick={handleLogOut}
             >
               Claim your tip
@@ -262,30 +316,139 @@ function getTweetID(tweetUrl: string): string | undefined {
   return undefined;
 }
 
-const getContract = async () => {
-  let { data: contract, error } = await supabase
-    .from("contracts")
-    .select("*")
-    .eq("active", true);
-  if (error) console.log("error", error);
+const getContract = async (): Promise<Contract | null> => {
+  try {
+    let { data: contracts, error } = await supabase
+      .from("contracts")
+      .select("*")
+      .eq("active", true);
+    if (error) {
+      console.log("getContract failed : ", error);
+      throw new Error("getContract failed");
+    }
 
-  return contract;
+    if (contracts) {
+      const contract = contracts[0];
+      return contract as Contract;
+    }
+
+    return null;
+  } catch (e) {
+    console.log("getContract failed : ", e);
+    throw new Error("getContract failed");
+  }
 };
 
-const createContract = async (address: string, user: User) => {
+const postContract = async (address: string, user: User): Promise<Contract> => {
   const user_id = user.id;
   const id = uuidv4();
 
-  let { data: contract, error } = await supabase
-    .from("contracts")
-    .insert({
-      address,
-      user_id,
-      id,
-    })
-    .single();
+  try {
+    let { data: contract, error } = await supabase
+      .from("contracts")
+      .insert({
+        address,
+        user_id,
+        id,
+      })
+      .single();
 
-  if (error) return console.log("error", error);
+    if (error) {
+      console.log("postContract failed : ", error);
+      throw new Error("postContract failed");
+    }
 
-  return contract;
+    return contract as Contract;
+  } catch (e: any) {
+    console.log("postContract failed : ", e);
+    throw new Error("postContract failed: ");
+  }
 };
+
+const postTip = async (
+  message: Message,
+  signature: string,
+  tweetOwnerId: string,
+  contract: any,
+  user: User
+): Promise<Tip> => {
+  const user_id = user.id;
+  const id = uuidv4();
+
+  try {
+    let { data: tip, error } = await supabase
+      .from("tips")
+      .insert({
+        id,
+        user_id,
+        tweet_id: message.tweetID,
+        nonce: message.nonce,
+        tweet_owner_id: tweetOwnerId,
+        amount: message.ethAmount,
+        contract_id: contract.id,
+        signature,
+      })
+      .single();
+
+    if (error) {
+      console.log("postTip failed: ", error);
+      throw new Error("postTip failed");
+    }
+
+    return tip as Tip;
+  } catch (e) {
+    console.log("postTip failed: ", e);
+    throw new Error("postTip failed");
+  }
+};
+
+const makeNewMessage = (
+  ethAmount: BigNumber,
+  tweetID: string,
+  nonce: string,
+  contractAddress: string
+): Message => {
+  const message = {
+    tweetID,
+    ethAmount,
+    nonce,
+    contractAddress,
+  };
+
+  return message;
+};
+
+const generateNonce = () => {
+  return ethers.utils.hexlify(ethers.utils.randomBytes(16));
+};
+
+interface Message {
+  tweetID: string;
+  ethAmount: BigNumber;
+  nonce: string;
+  contractAddress: string;
+}
+
+interface Contract {
+  id: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+  address: string;
+  active: boolean;
+}
+
+interface Tip {
+  id: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string;
+  contract_id: string;
+  tweet_id: string;
+  nonce: string;
+  amount: string;
+  tweet_owner_id: string;
+  signature: string;
+}
