@@ -174,9 +174,8 @@ const Home: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Session", session);
-    });
+    const session = supabase.auth.session();
+    console.log("session", session)
   }),
     [];
 
