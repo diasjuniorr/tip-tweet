@@ -21,10 +21,10 @@ const SignIn = () => {
       return alert(JSON.stringify(error));
     }
 
+    console.log("twitter user: ", user);
+
     return router.push("/");
   };
-
-  router.push("/");
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
