@@ -18,6 +18,7 @@ const Home: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [tweetUrl, setTweetUrl] = useState("");
   const [tipAmount, setTipAmount] = useState("");
+  const [isMiningTx, setIsMiningTx] = useState(false);
 
   const router = useRouter();
 
@@ -43,6 +44,8 @@ const Home: NextPage = () => {
 
       const { ethereum } = window;
 
+      ethereum.on("message", captureMetaMaskMessage);
+
       if (!currentAccount) {
         throw new Error("No account connected");
       }
@@ -67,18 +70,23 @@ const Home: NextPage = () => {
       console.log("message", message);
       const signature = await signMessage(message);
 
+      setIsMiningTx(true);
       const tx = await tipTweetContract.tipTweet(signature, {
         value: ethAmount,
         gasLimit: 300000,
       });
 
       await tx;
+      console.log("AVANCOU");
 
       //what if saving tip fails?
       const newTip = await postTip(message, signature as string, tweetOwnerId);
       console.log("newTip", newTip);
+
+      setIsMiningTx(false);
       return;
     } catch (e) {
+      setIsMiningTx(false);
       throw new Error("Attempt to tip tweet failed");
     }
   }
@@ -165,6 +173,12 @@ const Home: NextPage = () => {
     checkIfWalletIsConnected();
   }, []);
 
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Session", session);
+    })
+  }), []
+
   const renderNotConnectedContainer = () => (
     <div className="flex justify-center">
       <button
@@ -212,16 +226,14 @@ const Home: NextPage = () => {
               <button
                 className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
                 type="submit"
+                disabled={isMiningTx}
               >
-                Tip Tweet
+                {isMiningTx ? "Mining..." : "Tip Tweet"}
               </button>
             </form>
             <div className="text-center text-3xl text-white m-10">OR</div>
-            <button
-              className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-              onClick={handleLogOut}
-            >
-              Claim your tip
+            <button className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2">
+              Claim Your Tip
             </button>
           </div>
         )}
@@ -294,6 +306,10 @@ const generateNonce = () => {
   return ethers.utils.hexlify(ethers.utils.randomBytes(16));
 };
 
+const captureMetaMaskMessage = (message: ProviderMessage) => {
+  console.log("MetaMask message: ", message);
+};
+
 interface Message {
   tweetID: string;
   ethAmount: BigNumber;
@@ -313,4 +329,9 @@ interface Tip {
   amount: string;
   tweet_owner_id: string;
   signature: string;
+}
+
+interface ProviderMessage {
+  type: string;
+  data: unknown;
 }
