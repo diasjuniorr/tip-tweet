@@ -2,7 +2,6 @@ import { MouseEventHandler, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { BigNumber, ethers } from "ethers";
-import { TipTweet } from "../../typechain/";
 import supabase from "../lib/supabase";
 import { v4 as uuidv4 } from "uuid";
 import { http } from "../lib/http";
@@ -55,7 +54,7 @@ const Home: NextPage = () => {
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
-      ) as TipTweet;
+      );
 
       //
       const message = makeNewMessage(
