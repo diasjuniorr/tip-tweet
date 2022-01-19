@@ -40,7 +40,7 @@ const Home: NextPage = () => {
       const tweetOwnerId = tweetOwnerData.userId;
 
       const nonce = generateNonce();
-      const ethAmount = ethers.utils.parseEther(tipAmount);
+      const ethAmount = ethers.utils.parseEther(tipAmount.replaceAll(",", "."));
 
       const { ethereum } = window;
 
