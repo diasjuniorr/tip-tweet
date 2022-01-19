@@ -169,18 +169,13 @@ const Home: NextPage = () => {
     }
   };
 
-  const fetchData = async () => {
-    const teste = await http("/api/v1/tips");
-    console.log("teste", teste)
-  }
-
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
 
   useEffect(() => {
     const session = supabase.auth.session();
-    console.log("session", session)
+    console.log("session", session);
   }),
     [];
 
@@ -239,7 +234,7 @@ const Home: NextPage = () => {
             <div className="text-center text-3xl text-white m-10">OR</div>
             <button
               className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-              onClick={fetchData}
+              onClick={handleLogOut}
             >
               Claim Your Tip
             </button>
