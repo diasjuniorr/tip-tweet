@@ -7,7 +7,6 @@ contract TipTweet {
     address public owner;
 
     mapping(string => bool) usedNonces;
-    mapping(bytes => address) signatureToOwner;
 
     constructor() payable{
         owner = msg.sender;
@@ -17,17 +16,13 @@ contract TipTweet {
         return address(this).balance;
     }
 
-    function tipTweet(bytes memory signature) public payable {
-       signatureToOwner[signature] = msg.sender; 
-    }
-
     function claimTip(string memory tweetID, uint256 amount, string memory nonce, bytes memory signature) public {
-        require(!usedNonces[nonce], "Nonce already used");
+        require(!usedNonces[nonce]);
         usedNonces[nonce] = true;
 
         bytes32 message = prefixed(keccak256(abi.encodePacked(tweetID, amount, nonce, this)));
 
-        require(recoverSigner(message, signature) == signatureToOwner[signature], "Signature is not valid.");
+        require(recoverSigner(message, signature) == owner, "Signature is not valid.");
 
         (bool success, ) = (msg.sender).call{value: amount}("");
         require(success, "Failed to withdraw money from contract.");
