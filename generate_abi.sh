@@ -7,4 +7,4 @@ set -e
 
 
 
-cp ./artifacts/contracts/TipTweet.sol/TipTweet.json ./front-end/src/contracts/abi/TipTweet.json
+cp ./artifacts/contracts/TipTweet.sol/TipTweet.json ./front-end/contracts/abi/TipTweet.json
