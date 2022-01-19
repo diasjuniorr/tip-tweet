@@ -176,8 +176,9 @@ const Home: NextPage = () => {
   useEffect(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
       console.log("Session", session);
-    })
-  }), []
+    });
+  }),
+    [];
 
   const renderNotConnectedContainer = () => (
     <div className="flex justify-center">
@@ -232,7 +233,10 @@ const Home: NextPage = () => {
               </button>
             </form>
             <div className="text-center text-3xl text-white m-10">OR</div>
-            <button className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2">
+            <button
+              className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+              onClick={handleLogOut}
+            >
               Claim Your Tip
             </button>
           </div>
