@@ -13,26 +13,18 @@ const SignIn = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { user, error } = await supabase.auth.signIn({
-      email,
-      password,
+    const { user, session, error } = await supabase.auth.signIn({
+      provider: "twitter",
     });
 
     if (error) {
       return alert(JSON.stringify(error));
     }
 
-    const userAlreadyCreated = await getUser(user as User);
-
-    if (!userAlreadyCreated) {
-      const user_id = await createUser(user as User);
-      console.log("user_id", user_id);
-
-      return router.push("/");
-    }
-
-    router.push("/");
+    return router.push("/");
   };
+
+  router.push("/");
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
@@ -82,27 +74,3 @@ const SignIn = () => {
 };
 
 export default SignIn;
-
-const getUser = async (user: User) => {
-  const { data: error } = await supabase
-    .from("users")
-    .select("id")
-    .eq("id", user.id);
-
-  if (error) return false;
-
-  return true;
-};
-
-const createUser = async (user: User) => {
-  const { data: user_id, error } = await supabase
-    .from("users")
-    .insert({
-      id: user.id,
-    })
-    .single();
-
-  if (error) return console.log("error", error);
-
-  return user_id;
-};
