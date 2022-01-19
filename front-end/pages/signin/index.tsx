@@ -22,8 +22,6 @@ const SignIn = () => {
     }
 
     console.log("twitter user: ", user);
-
-    return router.push("/");
   };
 
   return (
