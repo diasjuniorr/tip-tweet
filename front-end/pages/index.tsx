@@ -2,13 +2,15 @@ import { MouseEventHandler, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { BigNumber, ethers } from "ethers";
+import { TipTweet } from "../../typechain/";
 import supabase from "../lib/supabase";
-import { User } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { http } from "../lib/http";
 import abi from "../contracts/abi/TipTweet.json";
 
 const CONTRACT_ABI = abi.abi;
+// const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "";
+const CONTRACT_ADDRESS = "0x65c9dc7066be9caad1cb102c114aa2401c7a3b03";
 
 //typescript workaround
 declare let window: any;
@@ -17,8 +19,6 @@ const Home: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [tweetUrl, setTweetUrl] = useState("");
   const [tipAmount, setTipAmount] = useState("");
-  const [contract, setContract] = useState<Contract | null>();
-  const [user, setUser] = useState<User | null>();
 
   const router = useRouter();
 
@@ -32,7 +32,7 @@ const Home: NextPage = () => {
         return;
       }
 
-      //get twiiter user id
+      //get twitter user id
       const tweetOwnerData = await http(
         `/api/v1/twitter/users/tweets/${tweetID}`
       );
@@ -42,94 +42,47 @@ const Home: NextPage = () => {
       const nonce = generateNonce();
       const ethAmount = ethers.utils.parseEther(tipAmount);
 
-      //if user does not have a wallet (contract deployed) deploy a new one
-      if (!contract) {
-        console.log("No contract address found");
-        const address = await deployTipContract(ethAmount);
-
-        const newContract = await postContract(address as string, user as User);
-
-        if (!newContract) {
-          throw new Error("Could not post contract");
-        }
-
-        const message = makeNewMessage(
-          ethAmount,
-          tweetID,
-          nonce,
-          newContract.address
-        );
-
-        console.log("message", message);
-        const signature = await signMessage(message);
-
-        //what if saving tip fails?
-        const newTip = await postTip(
-          message,
-          signature as string,
-          tweetOwnerId,
-          newContract,
-          user as User
-        );
-        console.log("newTip", newTip);
-        return;
-      }
-
-      //if user already has a wallet (deployed contract) use it
-      //TODO: transfer founds to user's wallet (deployed contract)
-
-      const message = makeNewMessage(
-        ethAmount,
-        tweetID,
-        nonce,
-        contract.address
-      );
-
-      const signature = await signMessage(message);
-
-      const newTip = await postTip(
-        message,
-        signature as string,
-        tweetOwnerId,
-        contract,
-        user as User
-      );
-      console.log("newTip", newTip);
-      return;
-    } catch (e) {
-      throw new Error("Attempt to tip tweet failed");
-    }
-  }
-
-  const deployTipContract = async (ethAmount: BigNumber) => {
-    try {
       const { ethereum } = window;
 
       if (!currentAccount) {
         throw new Error("No account connected");
       }
 
-      const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.Web3Provider(ethereum);
       // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
-
-      const factory = new ethers.ContractFactory(
+      const tipTweetContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
         CONTRACT_ABI,
-        abi.bytecode,
         signer
+      ) as TipTweet;
+
+      //
+      const message = makeNewMessage(
+        ethAmount,
+        tweetID,
+        nonce,
+        CONTRACT_ADDRESS
       );
 
-      const tipTweet = await factory.deploy({
-        value: ethAmount,
-      });
-      await tipTweet.deployed();
+      console.log("message", message);
+      const signature = await signMessage(message);
 
-      return tipTweet.address;
-    } catch (err) {
-      console.log(err);
-      throw new Error("Could not deploy contract");
+      const tx = await tipTweetContract.tipTweet(signature, {
+        value: ethAmount,
+        gasLimit: 300000,
+      });
+
+      await tx;
+
+      //what if saving tip fails?
+      const newTip = await postTip(message, signature as string, tweetOwnerId);
+      console.log("newTip", newTip);
+      return;
+    } catch (e) {
+      throw new Error("Attempt to tip tweet failed");
     }
-  };
+  }
 
   const signMessage = async (message: Message) => {
     const { ethAmount, tweetID, nonce, contractAddress } = message;
@@ -138,7 +91,7 @@ const Home: NextPage = () => {
         throw new Error("No account connected");
       }
       const { ethereum } = window;
-      const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.Web3Provider(ethereum);
       // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
       const messageHashed = ethers.utils.solidityKeccak256(
@@ -209,6 +162,10 @@ const Home: NextPage = () => {
     }
   };
 
+  useEffect(() => {
+    checkIfWalletIsConnected();
+  }, []);
+
   const renderNotConnectedContainer = () => (
     <div className="flex justify-center">
       <button
@@ -219,37 +176,6 @@ const Home: NextPage = () => {
       </button>
     </div>
   );
-
-  useEffect(() => {
-    checkIfWalletIsConnected();
-  }, []);
-
-  useEffect(() => {
-    const getProfile = () => {
-      const profile = supabase.auth.user();
-
-      if (profile) {
-        setUser(profile);
-      } else {
-        router.push("/signin");
-      }
-    };
-
-    getProfile();
-  }, []);
-
-  useEffect(() => {
-    getContract().then((contract) => {
-      if (contract) {
-        setContract(contract);
-      }
-    });
-  }, [user]);
-
-  if (!user) {
-    // Currently loading asynchronously User Supabase Information
-    return null;
-  }
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
@@ -317,63 +243,11 @@ function getTweetID(tweetUrl: string): string | undefined {
   return undefined;
 }
 
-const getContract = async (): Promise<Contract | null> => {
-  try {
-    let { data: contracts, error } = await supabase
-      .from("contracts")
-      .select("*")
-      .eq("active", true);
-    if (error) {
-      console.log("getContract failed : ", error);
-      throw new Error("getContract failed");
-    }
-
-    if (contracts) {
-      const contract = contracts[0];
-      return contract as Contract;
-    }
-
-    return null;
-  } catch (e) {
-    console.log("getContract failed : ", e);
-    throw new Error("getContract failed");
-  }
-};
-
-const postContract = async (address: string, user: User): Promise<Contract> => {
-  const user_id = user.id;
-  const id = uuidv4();
-
-  try {
-    let { data: contract, error } = await supabase
-      .from("contracts")
-      .insert({
-        address,
-        user_id,
-        id,
-      })
-      .single();
-
-    if (error) {
-      console.log("postContract failed : ", error);
-      throw new Error("postContract failed");
-    }
-
-    return contract as Contract;
-  } catch (e: any) {
-    console.log("postContract failed : ", e);
-    throw new Error("postContract failed: ");
-  }
-};
-
 const postTip = async (
   message: Message,
   signature: string,
-  tweetOwnerId: string,
-  contract: any,
-  user: User
+  tweetOwnerId: string
 ): Promise<Tip> => {
-  const user_id = user.id;
   const id = uuidv4();
 
   try {
@@ -381,12 +255,10 @@ const postTip = async (
       .from("tips")
       .insert({
         id,
-        user_id,
         tweet_id: message.tweetID,
         nonce: message.nonce,
         tweet_owner_id: tweetOwnerId,
         amount: message.ethAmount,
-        contract_id: contract.id,
         signature,
       })
       .single();
@@ -428,16 +300,6 @@ interface Message {
   ethAmount: BigNumber;
   nonce: string;
   contractAddress: string;
-}
-
-interface Contract {
-  id: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
-  address: string;
-  active: boolean;
 }
 
 interface Tip {
