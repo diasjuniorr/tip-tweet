@@ -127,7 +127,14 @@ const Tips: NextPage = () => {
         signer
       ) 
 
-    //   const ethAmount = JSON.stringify(tip.amount);
+      const ethAmount = JSON.parse(tip.amount);
+      console.log("parse: ", ethAmount);
+
+      const teste = JSON.parse(tip.amount).toString();
+      console.log("to string: ", teste);
+
+      const novo = JSON.parse(tip.amount).toBigNumber();
+      console.log("novo: ", novo)
 
       const verifySignature = await tipTweetContract.claimTip(
         tip.tweet_id,
