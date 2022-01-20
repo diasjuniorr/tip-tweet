@@ -265,14 +265,17 @@ const postTip = async (
   try {
     let { data: tip, error } = await supabase
       .from("tips")
-      .insert({
-        id,
-        tweet_id: message.tweetID,
-        nonce: message.nonce,
-        tweet_owner_id: tweetOwnerId,
-        amount: message.ethAmount,
-        signature,
-      }, { returning: 'minimal' })
+      .insert(
+        {
+          id,
+          tweet_id: message.tweetID,
+          nonce: message.nonce,
+          tweet_owner_id: tweetOwnerId,
+          amount: message.ethAmount,
+          signature,
+        },
+        { returning: "minimal" }
+      )
       .single();
 
     if (error) {
@@ -288,19 +291,21 @@ const postTip = async (
 };
 
 const getTips = async () => {
-  try{
-    let {data: tips, error} = await supabase.from("tips").select("*")
+  try {
+    let { data: tips, error } = await supabase.from("tips").select("*");
     if (error) {
       console.log("getTips failed: ", error);
       throw new Error("getTips failed");
     }
 
-    return tips
-  }catch(e){
-console.log("getTips failed: ", e);
-      throw new Error("getTips failed");
+    testCustomFunc()
+    return tips;
+  } catch (e) {
+    console.log("getTips failed: ", e);
+    throw new Error("getTips failed");
   }
-}
+
+};
 
 const makeNewMessage = (
   ethAmount: BigNumber,
@@ -318,10 +323,16 @@ const makeNewMessage = (
   return message;
 };
 
+const testCustomFunc = async () => {
+  let { data, error } = await supabase.rpc("twitterid");
+
+  if (error) console.error("error: ", error);
+  else console.log("data: ", data);
+};
+
 const generateNonce = () => {
   return ethers.utils.hexlify(ethers.utils.randomBytes(16));
 };
-
 
 interface Message {
   tweetID: string;
