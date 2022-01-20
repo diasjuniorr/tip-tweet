@@ -272,7 +272,7 @@ const postTip = async (
         tweet_owner_id: tweetOwnerId,
         amount: message.ethAmount,
         signature,
-      })
+      }, { returning: 'minimal' })
       .single();
 
     if (error) {
