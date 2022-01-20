@@ -298,13 +298,11 @@ const getTips = async () => {
       throw new Error("getTips failed");
     }
 
-    testCustomFunc()
     return tips;
   } catch (e) {
     console.log("getTips failed: ", e);
     throw new Error("getTips failed");
   }
-
 };
 
 const makeNewMessage = (
@@ -321,13 +319,6 @@ const makeNewMessage = (
   };
 
   return message;
-};
-
-const testCustomFunc = async () => {
-  let { data, error } = await supabase.rpc("twitterid");
-
-  if (error) console.error("error: ", error);
-  else console.log("data: ", data);
 };
 
 const generateNonce = () => {
@@ -353,9 +344,4 @@ interface Tip {
   amount: string;
   tweet_owner_id: string;
   signature: string;
-}
-
-interface ProviderMessage {
-  type: string;
-  data: unknown;
 }
