@@ -1,5 +1,5 @@
-create or replace function auth.twitterID() returns text as $$
-  select nullif(current_setting('request.jwt.claim.user_metada.sub', true), '')::text;
+create or replace function auth.twitterid() returns text as $$
+SELECT current_setting('request.jwt.claims', true)::json#>>'{user_metadata,sub}';
 $$ language sql;
 
 -- Create a table for "tips"
@@ -15,6 +15,9 @@ create table tips (
   signature text not null
 );
 
+create policy "Anyone can post a tip."
+  on tips for insert
+  with check ( auth.uid() = id );
 
 create policy "Only tweet owners can get their tips"
   on tips
