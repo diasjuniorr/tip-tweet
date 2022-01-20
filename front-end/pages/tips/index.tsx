@@ -1,9 +1,13 @@
 import { User } from "@supabase/supabase-js";
+import { ethers } from "ethers";
 import { NextPage } from "next";
 import { MouseEventHandler, useEffect, useState } from "react";
 import supabase from "../../lib/supabase";
 
+declare let window: any;
+
 const Tips: NextPage = () => {
+  const [currentAccount, setCurrentAccount] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [tips, setTips] = useState<Tip[]>([]);
 
@@ -56,33 +60,94 @@ const Tips: NextPage = () => {
     getTips();
   }, [user]);
 
+  const checkIfWalletIsConnected = async () => {
+    const { ethereum } = window;
+
+    if (!ethereum) {
+      console.log("Make sure you have metamask!");
+      return;
+    } else {
+      console.log("We have the ethereum object", ethereum);
+    }
+
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+
+    if (accounts.length !== 0) {
+      const account = accounts[0];
+      console.log("Found an authorized account:", account);
+      setCurrentAccount(account);
+    } else {
+      console.log("No authorized account found");
+    }
+  };
+
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        alert("Get MetaMask!");
+        return;
+      }
+
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      console.log("Connected", accounts[0]);
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkIfWalletIsConnected();
+  }, []);
+
   if (!user) {
     // Currently loading asynchronously User Supabase Information
     return null;
   }
   return (
     <>
-      <h1>Tips</h1>
-      <div>
-        {tips.map((tip) => (
-          <div key={tip.id}>
-            <div className="max-w-sm rounded overflow-hidden shadow-lg">
-              <div className="px-6 py-4">
-                <div className="font-bold text-xl mb-2">Title</div>
-                <p className="text-gray-700 text-base">
-                  tweet ID = {tip.tweet_id}
-                </p>
+      {currentAccount ? (
+        <>
+          <h1>Tips</h1>
+          <div>
+            {tips.map((tip) => (
+              <div key={tip.id}>
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                  <div className="px-6 py-4">
+                    <div className="font-bold text-xl mb-2">Title</div>
+                    <p className="text-gray-700 text-base">
+                      tweet ID = {tip.tweet_id}
+                    </p>
+                  </div>
+                  <div className="px-6 pt-4 pb-2">
+                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                      {ethers.utils.formatEther(tip.amount)} ETH
+                    </span>
+                    <button
+                      onClick={connectWallet}
+                      className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+                    >
+                      Claim Tip
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="px-6 pt-4 pb-2">
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                  {tip.amount} ETH
-                </span>
-                <button>Claim Tip</button>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      ) : (
+        <button
+          onClick={connectWallet}
+          className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+        >
+          Connect to Wallet
+        </button>
+      )}
       <button onClick={handleLogOut}>log out</button>
     </>
   );
