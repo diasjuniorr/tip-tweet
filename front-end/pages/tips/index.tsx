@@ -127,17 +127,17 @@ const Tips: NextPage = () => {
         signer
       ) 
 
-      const ethAmount = JSON.parse(tip.amount);
-      console.log("parse: ", ethAmount);
+    //   const ethAmount = JSON.parse(tip.amount);
+    //   console.log("parse: ", ethAmount);
 
       
-      console.log("is big number: ", ethers.BigNumber.isBigNumber(ethAmount));
+    //   console.log("is big number: ", ethers.BigNumber.isBigNumber(ethAmount));
 
-      const teste = JSON.parse(tip.amount).toNumber();
-      console.log("to string: ", teste);
+    const amount = ethers.utils.parseEther(tip.amount);
+
       const verifySignature = await tipTweetContract.claimTip(
         tip.tweet_id,
-        tip.amount,
+        amount,
         tip.nonce,
         tip.signature,
         { gasLimit: 300000 }
@@ -169,7 +169,7 @@ const Tips: NextPage = () => {
                   </div>
                   <div className="px-6 pt-4 pb-2">
                     <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      {(JSON.parse(tip.amount).toString())} ETH
+                      {tip.amount} ETH
                     </span>
                     <button
                       onClick={() => verifySignature(tip)}

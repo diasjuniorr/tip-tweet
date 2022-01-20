@@ -75,7 +75,6 @@ const Home: NextPage = () => {
       });
 
       await tx;
-      console.log("AVANCOU");
 
       //what if saving tip fails?
       const newTip = await postTip(message, signature as string, tweetOwnerId);
@@ -262,6 +261,8 @@ const postTip = async (
 ): Promise<Tip> => {
   const id = uuidv4();
 
+  const amount = message.ethAmount.toString();
+
   try {
     let { data: tip, error } = await supabase
       .from("tips")
@@ -271,7 +272,7 @@ const postTip = async (
           tweet_id: message.tweetID,
           nonce: message.nonce,
           tweet_owner_id: tweetOwnerId,
-          amount: message.ethAmount,
+          amount,
           signature,
         },
         { returning: "minimal" }
