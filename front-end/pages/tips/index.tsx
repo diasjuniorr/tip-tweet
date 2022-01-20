@@ -3,8 +3,13 @@ import { ethers } from "ethers";
 import { NextPage } from "next";
 import { MouseEventHandler, useEffect, useState } from "react";
 import supabase from "../../lib/supabase";
+import abi from "../../contracts/abi/TipTweet.json";
 
 declare let window: any;
+
+const CONTRACT_ABI = abi.abi;
+// const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "";
+const CONTRACT_ADDRESS = "0x65c9dc7066be9caad1cb102c114aa2401c7a3b03";
 
 const Tips: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -105,6 +110,36 @@ const Tips: NextPage = () => {
     checkIfWalletIsConnected();
   }, []);
 
+  const verifySignature = async (tip: Tip) => {
+    try {
+      const { ethereum } = window;
+
+      if (!currentAccount) {
+        throw new Error("No account connected");
+      }
+
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      // const provider = new ethers.providers.JsonRpcProvider();
+      const signer = provider.getSigner();
+      const tipTweetContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      ) 
+
+      const verifySignature = await tipTweetContract.claimTip(
+        tip.tweet_id,
+        tip.amount,
+        tip.nonce,
+        tip.signature,
+        { gasLimit: 300000 }
+      );
+      console.log("verifySignature: ", verifySignature);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   if (!user) {
     // Currently loading asynchronously User Supabase Information
     return null;
@@ -129,7 +164,7 @@ const Tips: NextPage = () => {
                       {ethers.utils.formatEther(tip.amount)} ETH
                     </span>
                     <button
-                      onClick={connectWallet}
+                      onClick={() => verifySignature(tip)}
                       className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
                     >
                       Claim Tip
