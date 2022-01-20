@@ -231,7 +231,7 @@ const Home: NextPage = () => {
             <div className="text-center text-3xl text-white m-10">OR</div>
             <button
               className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-              onClick={getTips}
+              onClick={() => router.push("/tips")}
             >
               Claim Your Tip
             </button>
