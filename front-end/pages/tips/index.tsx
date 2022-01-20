@@ -25,7 +25,7 @@ const Tips: NextPage = () => {
           provider: "twitter",
           
         },{
-            redirectTo: "/tips",
+            redirectTo: "https://tip-tweet.vercel.app/tips",
         });
       }
       setUser(profile);
