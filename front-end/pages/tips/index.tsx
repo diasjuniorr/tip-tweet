@@ -55,7 +55,7 @@ const Tips: NextPage = () => {
           throw new Error("getTips failed");
         }
 
-        return setTips(tips as Tip[]);
+        return setTips(tips?.filter(tip => !tip.claimed) as Tip[]);
       } catch (e) {
         console.log("getTips failed: ", e);
         throw new Error("getTips failed");
@@ -144,6 +144,8 @@ const Tips: NextPage = () => {
         { gasLimit: 300000 }
       );
       console.log("verifySignature: ", verifySignature);
+
+      const { data: tips, error } = await supabase.from("tips").update({claimed: true}, {returning: "minimal"}).eq("id", tip.id);
     } catch (err) {
       console.log(err);
     }

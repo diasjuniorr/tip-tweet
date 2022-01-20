@@ -12,14 +12,20 @@ create table tips (
   nonce text not null,
   amount text not null,
   tweet_owner_id text not null,
+  claimed boolean not null default false,
   signature text not null
+  add constraint pk_tips primary key (id)
 );
 
 create policy "Anyone can post a tip."
   on tips for insert
-  with check ( auth.uid() = id );
+  with check ( true );
+
+create policy "Only the owner can update a tip."
+  on tips for update 
+  with check ( auth.twitterid() = tweet_owner_id);
 
 create policy "Only tweet owners can get their tips"
   on tips
   for select
-  using ( auth.twitterID() = tweet_owner_id );
+  using ( auth.twitterid() = tweet_owner_id );
