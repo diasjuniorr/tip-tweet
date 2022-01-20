@@ -145,7 +145,7 @@ const Tips: NextPage = () => {
       );
       console.log("verifySignature: ", verifySignature);
 
-      const { data: tips, error } = await supabase.from("tips").update({claimed: true}, {returning: "minimal"}).eq("id", tip.id);
+    //   const { data: tips, error } = await supabase.from("tips").update({claimed: true}, {returning: "minimal"}).eq("id", tip.id);
     } catch (err) {
       console.log(err);
     }
