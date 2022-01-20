@@ -23,6 +23,9 @@ const Tips: NextPage = () => {
       if (!profile) {
         return await supabase.auth.signIn({
           provider: "twitter",
+          
+        },{
+            redirectTo: "/tips",
         });
       }
       setUser(profile);
