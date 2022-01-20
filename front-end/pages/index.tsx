@@ -44,8 +44,6 @@ const Home: NextPage = () => {
 
       const { ethereum } = window;
 
-      ethereum.on("message", captureMetaMaskMessage);
-
       if (!currentAccount) {
         throw new Error("No account connected");
       }
@@ -234,7 +232,7 @@ const Home: NextPage = () => {
             <div className="text-center text-3xl text-white m-10">OR</div>
             <button
               className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-              onClick={handleLogOut}
+              onClick={getTips}
             >
               Claim Your Tip
             </button>
@@ -289,6 +287,21 @@ const postTip = async (
   }
 };
 
+const getTips = async () => {
+  try{
+    let {data: tips, error} = await supabase.from("tips").select("*")
+    if (error) {
+      console.log("getTips failed: ", error);
+      throw new Error("getTips failed");
+    }
+
+    return tips
+  }catch(e){
+console.log("getTips failed: ", e);
+      throw new Error("getTips failed");
+  }
+}
+
 const makeNewMessage = (
   ethAmount: BigNumber,
   tweetID: string,
@@ -309,9 +322,6 @@ const generateNonce = () => {
   return ethers.utils.hexlify(ethers.utils.randomBytes(16));
 };
 
-const captureMetaMaskMessage = (message: ProviderMessage) => {
-  console.log("MetaMask message: ", message);
-};
 
 interface Message {
   tweetID: string;
