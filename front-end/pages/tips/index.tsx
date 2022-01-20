@@ -22,12 +22,14 @@ const Tips: NextPage = () => {
       const profile = supabase.auth.user();
 
       if (!profile) {
-        return await supabase.auth.signIn({
-          provider: "twitter",
-          
-        },{
+        return await supabase.auth.signIn(
+          {
+            provider: "twitter",
+          },
+          {
             redirectTo: "https://tip-tweet.vercel.app/tips",
-        });
+          }
+        );
       }
       setUser(profile);
     };
@@ -43,7 +45,6 @@ const Tips: NextPage = () => {
           console.log("getTips failed: ", error);
           throw new Error("getTips failed");
         }
-
 
         return setTips(tips as Tip[]);
       } catch (e) {
@@ -63,12 +64,24 @@ const Tips: NextPage = () => {
     <>
       <h1>Tips</h1>
       <div>
-          {tips.map((tip) => (
-            <div key={tip.id}>
-                <p>{tip.tweet_id}</p>
+        {tips.map((tip) => (
+          <div key={tip.id}>
+            <div className="max-w-sm rounded overflow-hidden shadow-lg">
+              <div className="px-6 py-4">
+                <div className="font-bold text-xl mb-2">Title</div>
+                <p className="text-gray-700 text-base">
+                  tweet ID = {tip.tweet_id}
+                </p>
+              </div>
+              <div className="px-6 pt-4 pb-2">
+                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                  {tip.amount} ETH
+                </span>
                 <button>Claim Tip</button>
+              </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
       <button onClick={handleLogOut}>log out</button>
     </>
