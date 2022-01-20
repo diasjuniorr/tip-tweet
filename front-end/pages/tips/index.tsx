@@ -5,6 +5,7 @@ import supabase from "../../lib/supabase";
 
 const Tips: NextPage = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [tips, setTips] = useState<Tip[]>([]);
 
   const handleLogOut: MouseEventHandler = async (e) => {
     e.preventDefault();
@@ -34,6 +35,26 @@ const Tips: NextPage = () => {
     getProfile();
   }, []);
 
+  useEffect(() => {
+    const getTips = async () => {
+      try {
+        let { data: tips, error } = await supabase.from("tips").select("*");
+        if (error) {
+          console.log("getTips failed: ", error);
+          throw new Error("getTips failed");
+        }
+
+
+        return setTips(tips as Tip[]);
+      } catch (e) {
+        console.log("getTips failed: ", e);
+        throw new Error("getTips failed");
+      }
+    };
+
+    getTips();
+  }, [user]);
+
   if (!user) {
     // Currently loading asynchronously User Supabase Information
     return null;
@@ -41,10 +62,46 @@ const Tips: NextPage = () => {
   return (
     <>
       <h1>Tips</h1>
-      <div>Tweet </div>
+      <div>
+          {tips.map((tip) => (
+            <div key={tip.id}>
+                <p>{tip.tweet_id}</p>
+                <button>Claim Tip</button>
+            </div>
+          ))}
+      </div>
       <button onClick={handleLogOut}>log out</button>
     </>
   );
 };
 
 export default Tips;
+
+const getTips = async () => {
+  try {
+    let { data: tips, error } = await supabase.from("tips").select("*");
+    if (error) {
+      console.log("getTips failed: ", error);
+      throw new Error("getTips failed");
+    }
+
+    return tips;
+  } catch (e) {
+    console.log("getTips failed: ", e);
+    throw new Error("getTips failed");
+  }
+};
+
+interface Tip {
+  id: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string;
+  contract_id: string;
+  tweet_id: string;
+  nonce: string;
+  amount: string;
+  tweet_owner_id: string;
+  signature: string;
+}
