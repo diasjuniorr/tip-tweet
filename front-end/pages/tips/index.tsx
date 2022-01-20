@@ -134,6 +134,7 @@ const Tips: NextPage = () => {
     //   console.log("is big number: ", ethers.BigNumber.isBigNumber(ethAmount));
 
     const amount = ethers.utils.parseEther(tip.amount);
+    console.log("parse ether: ", amount);
 
       const verifySignature = await tipTweetContract.claimTip(
         tip.tweet_id,

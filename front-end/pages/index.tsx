@@ -261,7 +261,10 @@ const postTip = async (
 ): Promise<Tip> => {
   const id = uuidv4();
 
-  const amount = message.ethAmount.toString();
+  let bigNumberStr = message.ethAmount.toString();
+  let stringBigNumber = parseInt(bigNumberStr)/(1000000000000000000);
+  const amount = stringBigNumber.toString();
+
 
   try {
     let { data: tip, error } = await supabase
