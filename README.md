@@ -14,8 +14,8 @@ Tip Tweet is hybrid dApp that allows users to tip a tweet with crypto currency w
 
 ## Folder structure <a name = "folder_structure"></a>
 
-- root: contains the smart contract development environment. It usses [hardhat](https://hardhat.org/).
-- app: contains the front-end code developed with [Next.js](https://nextjs.org/) and [supabase](https://supabase.io/).
+- root: contains the smart contract development environment. It uses [Hardhat](https://hardhat.org/).
+- app: contains the front-end code developed with [Next.js](https://nextjs.org/) and [Supabase](https://supabase.io/).
 ## Getting Started <a name = "getting_started"></a>
 
 Clone the repo and install the dependencies with your preferred manager.
