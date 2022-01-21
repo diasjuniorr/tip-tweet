@@ -1,46 +1,69 @@
-# Advanced Sample Hardhat Project
+# hardhat-project
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+## Table of Contents
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+- [About](#about)
+- [Folder Structure](#folder_structure)
+- [Getting Started](#getting_started)
+- [Usage](#usage)
+- [Contributing](../CONTRIBUTING.md)
 
-Try running some of the following tasks:
+## About <a name = "about"></a>
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+Tip Tweet is hybrid dApp that allows users to tip a tweet with crypto currency without needing the author's wallet address or any other information but the tweet URL. The author can claim the tip just by logging with their Twitter account. It's under development and currently only supports Ethereum. At the moment it uses [Rinkeby](https://rinkeby.etherscan.io/) network.
+
+## Folder structure <a name = "folder_structure"></a>
+
+- root: contains the smart contract development environment. It usses [hardhat](https://hardhat.org/).
+- app: contains the front-end code developed with [Next.js](https://nextjs.org/) and [supabase](https://supabase.io/).
+## Getting Started <a name = "getting_started"></a>
+
+Clone the repo and install the dependencies with your preferred manager.
+
+- To install the dependencies for the smart contract development environment, run:
+```bash
+npm install
+## or
+yarn
 ```
 
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/sample-script.ts
+- To install the dependencies for the app code, run:
+```bash
+cd app
+npm install
+## or
+yarn
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+- To run the app locally, run:
+```bas
+npm run dev
+## or
+yarn dev
 ```
 
-# Performance optimizations
+### Prerequisites
 
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+
+
+### Installing
+
+A step by step series of examples that tell you how to get a development env running.
+
+Say what the step will be
+
+```
+Give the example
+```
+
+And repeat
+
+```
+until finished
+```
+
+End with an example of getting some data out of the system or using it for a little demo.
+
+## Usage <a name = "usage"></a>
+
+Add notes about how to use the system.
