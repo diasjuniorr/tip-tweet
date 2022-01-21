@@ -4,6 +4,7 @@ import { NextPage } from "next";
 import { MouseEventHandler, useEffect, useState } from "react";
 import supabase from "../../lib/supabase";
 import abi from "../../contracts/abi/TipTweet.json";
+import {  useRouter } from "next/router";
 
 declare let window: any;
 
@@ -16,6 +17,8 @@ const Tips: NextPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [tips, setTips] = useState<Tip[]>([]);
 
+  const router = useRouter();
+
   const handleLogOut: MouseEventHandler = async (e) => {
     e.preventDefault();
 
@@ -24,6 +27,8 @@ const Tips: NextPage = () => {
     if (error) {
       alert(JSON.stringify(error));
     }
+
+    return router.push("/"); 
   };
 
   useEffect(() => {
