@@ -36,7 +36,7 @@ yarn
 ```
 
  To run the app locally, run:
-```bas
+```bash
 npm run dev
 ## or
 yarn dev
