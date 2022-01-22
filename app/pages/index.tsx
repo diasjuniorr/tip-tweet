@@ -201,6 +201,7 @@ const Home: NextPage = () => {
                 Tweet URL
               </label>
               <input
+                disabled={isMiningTx}
                 placeholder="https://twitter.com/username/status/123456789"
                 className="py-2 px-4 rounded-md focus:outline-none focus:ring-2"
                 type="text"
@@ -213,6 +214,7 @@ const Home: NextPage = () => {
                 Tip Amount
               </label>
               <input
+                disabled={isMiningTx}
                 placeholder="0.00 eth"
                 className="py-2 px-4 rounded-md focus:outline-none focus:ring-2"
                 type="text"
@@ -231,10 +233,11 @@ const Home: NextPage = () => {
             </form>
             <div className="text-center text-3xl text-white m-10">OR</div>
             <button
+              disabled={isMiningTx}
               className="text-lg text-white font-semibold btn-bg-2 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
               onClick={() => router.push("/tips")}
             >
-              Claim Your Tip
+              {isMiningTx ? "Mining..." : "Claim Your Tip"}
             </button>
           </div>
         )}
