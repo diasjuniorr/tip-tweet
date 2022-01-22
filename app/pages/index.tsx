@@ -26,6 +26,7 @@ const Home: NextPage = () => {
     e.preventDefault();
 
     try {
+      setIsMiningTx(true);
       const tweetID = getTweetID(tweetUrl);
       if (!tweetID) {
         alert("Invalid tweet URL");
@@ -33,11 +34,10 @@ const Home: NextPage = () => {
       }
 
       //get twitter user id
-      const tweetOwnerData = await http(
+      const tweet: Tweet = await http(
         `/api/v1/twitter/users/tweets/${tweetID}`
       );
-      console.log("data", tweetOwnerData);
-      const tweetOwnerId = tweetOwnerData.userId;
+      console.log("data", tweet);
 
       const nonce = generateNonce();
       const ethAmount = ethers.utils.parseEther(tipAmount.replaceAll(",", "."));
@@ -68,7 +68,6 @@ const Home: NextPage = () => {
       console.log("message", message);
       const signature = await signMessage(message);
 
-      setIsMiningTx(true);
       const tx = await tipTweetContract.tipTweet(signature, {
         value: ethAmount,
         gasLimit: 300000,
@@ -76,8 +75,10 @@ const Home: NextPage = () => {
 
       await tx;
 
+     tweet.url = tweetUrl; 
+
       //what if saving tip fails?
-      const newTip = await postTip(message, signature as string, tweetOwnerId);
+      const newTip = await postTip(message, signature as string, tweet);
       console.log("newTip", newTip);
 
       setIsMiningTx(false);
@@ -257,7 +258,7 @@ function getTweetID(tweetUrl: string): string | undefined {
 const postTip = async (
   message: Message,
   signature: string,
-  tweetOwnerId: string
+  tweet: Tweet
 ): Promise<Tip> => {
   const id = uuidv4();
 
@@ -272,9 +273,11 @@ const postTip = async (
       .insert(
         {
           id,
-          tweet_id: message.tweetID,
           nonce: message.nonce,
-          tweet_owner_id: tweetOwnerId,
+          tweet_id: tweet.id,
+          tweet_owner_id: tweet.user_id,
+          tweet_url: tweet.url,
+          tweet_text: tweet.text,
           amount,
           signature,
         },
@@ -348,4 +351,11 @@ interface Tip {
   amount: string;
   tweet_owner_id: string;
   signature: string;
+}
+
+interface Tweet {
+  id: string;
+  user_id: string;
+  text: string;
+  url: string;
 }
