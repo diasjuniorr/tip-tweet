@@ -35,7 +35,7 @@ const Home: NextPage = () => {
 
       //get twitter user id
       const tweet: Tweet = await http(
-        `/api/v1/twitter/users/tweets/${tweetID}`
+        `/api/v1/tweets/${tweetID}`
       );
       console.log("data", tweet);
 
@@ -274,7 +274,7 @@ const postTip = async (
         {
           id,
           nonce: message.nonce,
-          tweet_id: tweet.id,
+          tweet_id: tweet.tweet_id,
           tweet_owner_id: tweet.user_id,
           tweet_url: tweet.url,
           tweet_text: tweet.text,
@@ -294,21 +294,6 @@ const postTip = async (
   } catch (e) {
     console.log("postTip failed: ", e);
     throw new Error("postTip failed");
-  }
-};
-
-const getTips = async () => {
-  try {
-    let { data: tips, error } = await supabase.from("tips").select("*");
-    if (error) {
-      console.log("getTips failed: ", error);
-      throw new Error("getTips failed");
-    }
-
-    return tips;
-  } catch (e) {
-    console.log("getTips failed: ", e);
-    throw new Error("getTips failed");
   }
 };
 
@@ -354,7 +339,7 @@ interface Tip {
 }
 
 interface Tweet {
-  id: string;
+  tweet_id: string;
   user_id: string;
   text: string;
   url: string;
