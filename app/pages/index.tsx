@@ -30,7 +30,7 @@ const Home: NextPage = () => {
       const tweetID = getTweetID(tweetUrl);
       if (!tweetID) {
         alert("Invalid tweet URL");
-        return;
+        throw new Error("Invalid tweet URL");
       }
 
       //get twitter user id
