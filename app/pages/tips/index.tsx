@@ -20,6 +20,55 @@ const Tips: NextPage = () => {
 
   const router = useRouter();
 
+  const claimTip = async (tip: Tip) => {
+    try {
+      const { ethereum } = window;
+
+      if (!currentAccount) {
+        throw new Error("No account connected");
+      }
+
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      // const provider = new ethers.providers.JsonRpcProvider();
+      const signer = provider.getSigner();
+      const tipTweetContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      )
+
+      const amount = ethers.utils.parseEther(tip.amount);
+
+      
+
+      
+
+      const claimTip = await tipTweetContract.claimTip(
+        tip.tweet_id,
+        amount,
+        tip.nonce,
+        tip.signature,
+        { gasLimit: 300000 }
+      );
+
+      await claimTip.wait();
+      console.log("verifySignature: ", claimTip);
+
+      let { data:  error } = await supabase
+      .from("tips")
+      .update(
+        {claimed: true}
+      )
+
+      if (error) {
+        console.log("claimTip failed: ", error);
+        throw new Error("claimTip failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleLogOut: MouseEventHandler = async (e) => {
     e.preventDefault();
 
@@ -129,7 +178,7 @@ const Tips: NextPage = () => {
             <h1 className="text-center font-bold text-white">Tips</h1>
             <div>
               {tips.map((tip) => (
-                <TipComponent tip={tip} />
+                <TipComponent tip={tip} claimTip={claimTip} />
               ))}
             </div>
           </>
