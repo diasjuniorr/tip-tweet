@@ -4,7 +4,7 @@ interface TipProps {
 
 const TipComponent: React.FC<TipProps> = ({ tip }) => {
   return (
-    <div className="flex flex-row bg-white w-full h-40 items-center rounded-md">
+    <div className="flex flex-row bg-white w-full h-40 items-center rounded-md mb-6">
       <div className="basis-9/12 py-6 px-6 font-semibold">
         <p>{tip.tweet_text}</p>
         <div className="mt-4 font-light">
