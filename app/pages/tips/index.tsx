@@ -4,7 +4,8 @@ import { NextPage } from "next";
 import { MouseEventHandler, useEffect, useState } from "react";
 import supabase from "../../lib/supabase";
 import abi from "../../contracts/abi/TipTweet.json";
-import {  useRouter } from "next/router";
+import { useRouter } from "next/router";
+import TipComponent from "../../components/Tip";
 
 declare let window: any;
 
@@ -28,7 +29,7 @@ const Tips: NextPage = () => {
       alert(JSON.stringify(error));
     }
 
-    return router.push("/"); 
+    return router.push("/");
   };
 
   useEffect(() => {
@@ -60,7 +61,7 @@ const Tips: NextPage = () => {
           throw new Error("getTips failed");
         }
 
-        return setTips(tips?.filter(tip => !tip.claimed) as Tip[]);
+        return setTips(tips?.filter((tip) => !tip.claimed) as Tip[]);
       } catch (e) {
         console.log("getTips failed: ", e);
         throw new Error("getTips failed");
@@ -123,23 +124,17 @@ const Tips: NextPage = () => {
         throw new Error("No account connected");
       }
 
-      const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.Web3Provider(ethereum);
       // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
       const tipTweetContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
-      ) 
+      );
 
-    //   const ethAmount = JSON.parse(tip.amount);
-    //   console.log("parse: ", ethAmount);
-
-      
-    //   console.log("is big number: ", ethers.BigNumber.isBigNumber(ethAmount));
-
-    const amount = ethers.utils.parseEther(tip.amount);
-    console.log("parse ether: ", amount);
+      const amount = ethers.utils.parseEther(tip.amount);
+      console.log("parse ether: ", amount);
 
       const verifySignature = await tipTweetContract.claimTip(
         tip.tweet_id,
@@ -150,7 +145,7 @@ const Tips: NextPage = () => {
       );
       console.log("verifySignature: ", verifySignature);
 
-    //   const { data: tips, error } = await supabase.from("tips").update({claimed: true}, {returning: "minimal"}).eq("id", tip.id);
+      //   const { data: tips, error } = await supabase.from("tips").update({claimed: true}, {returning: "minimal"}).eq("id", tip.id);
     } catch (err) {
       console.log(err);
     }
@@ -160,6 +155,7 @@ const Tips: NextPage = () => {
     // Currently loading asynchronously User Supabase Information
     return null;
   }
+
   return (
     <>
       {currentAccount ? (
@@ -167,27 +163,7 @@ const Tips: NextPage = () => {
           <h1>Tips</h1>
           <div>
             {tips.map((tip) => (
-              <div key={tip.id}>
-                <div className="max-w-sm rounded overflow-hidden shadow-lg">
-                  <div className="px-6 py-4">
-                    <div className="font-bold text-xl mb-2">Title</div>
-                    <p className="text-gray-700 text-base">
-                      tweet ID = {tip.tweet_id}
-                    </p>
-                  </div>
-                  <div className="px-6 pt-4 pb-2">
-                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      {tip.amount} ETH
-                    </span>
-                    <button
-                      onClick={() => verifySignature(tip)}
-                      className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-                    >
-                      Claim Tip
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <TipComponent tip={tip} />
             ))}
           </div>
         </>
@@ -221,13 +197,15 @@ const getTips = async () => {
   }
 };
 
-interface Tip {
+export interface Tip {
   id: string;
   user_id: string;
   created_at: string;
   updated_at: string;
   deleted_at: string;
   contract_id: string;
+  tweet_url: string;
+  tweet_text: string;
   tweet_id: string;
   nonce: string;
   amount: string;
