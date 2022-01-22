@@ -4,31 +4,23 @@ interface TipProps {
 
 const TipComponent: React.FC<TipProps> = ({ tip }) => {
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800">
-      <div className="max-w-2xl w-full">
-        <div className="flex flex-row bg-white w-full h-40 items-center rounded-md">
-          <div className="basis-9/12 py-6 px-6 font-semibold">
-            <p>{tip.tweet_text}</p>
-            <div className="mt-4 font-light">
-              <a
-                className="hover:underline"
-                target="_blank"
-                href={tip.tweet_url}
-              >
-                Go to tweet
-              </a>
-            </div>
-          </div>
-          <div className="flex flex-col basis-3/12 items-center justify-between">
-            <div className="text-center text-lg font-semibold">
-              <p>{tip.amount} eth</p>
-            </div>
-            <div className="mt-4">
-              <button className="text-lg text-white font-semibold btn-bg-2 py-1 px-3 rounded-md focus:outline-none focus:ring-2 h-12 w-32 transition ease delay-75 hover:-translate-y-1">
-                Claim
-              </button>
-            </div>
-          </div>
+    <div className="flex flex-row bg-white w-full h-40 items-center rounded-md">
+      <div className="basis-9/12 py-6 px-6 font-semibold">
+        <p>{tip.tweet_text}</p>
+        <div className="mt-4 font-light">
+          <a className="hover:underline" target="_blank" href={tip.tweet_url}>
+            Go to tweet
+          </a>
+        </div>
+      </div>
+      <div className="flex flex-col basis-3/12 items-center justify-between">
+        <div className="text-center text-lg font-semibold">
+          <p>{tip.amount} eth</p>
+        </div>
+        <div className="mt-4">
+          <button className="text-lg text-white font-semibold btn-bg-2 py-1 px-3 rounded-md focus:outline-none focus:ring-2 h-12 w-32 transition ease delay-75 hover:-translate-y-1">
+            Claim
+          </button>
         </div>
       </div>
     </div>
