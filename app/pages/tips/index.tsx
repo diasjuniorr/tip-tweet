@@ -116,67 +116,34 @@ const Tips: NextPage = () => {
     checkIfWalletIsConnected();
   }, []);
 
-  const verifySignature = async (tip: Tip) => {
-    try {
-      const { ethereum } = window;
-
-      if (!currentAccount) {
-        throw new Error("No account connected");
-      }
-
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      // const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner();
-      const tipTweetContract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        CONTRACT_ABI,
-        signer
-      );
-
-      const amount = ethers.utils.parseEther(tip.amount);
-      console.log("parse ether: ", amount);
-
-      const verifySignature = await tipTweetContract.claimTip(
-        tip.tweet_id,
-        amount,
-        tip.nonce,
-        tip.signature,
-        { gasLimit: 300000 }
-      );
-      console.log("verifySignature: ", verifySignature);
-
-      //   const { data: tips, error } = await supabase.from("tips").update({claimed: true}, {returning: "minimal"}).eq("id", tip.id);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   if (!user) {
     // Currently loading asynchronously User Supabase Information
     return null;
   }
 
   return (
-    <>
-      {currentAccount ? (
-        <>
-          <h1>Tips</h1>
-          <div>
-            {tips.map((tip) => (
-              <TipComponent tip={tip} />
-            ))}
-          </div>
-        </>
-      ) : (
-        <button
-          onClick={connectWallet}
-          className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-        >
-          Connect to Wallet
-        </button>
-      )}
-      <button onClick={handleLogOut}>log out</button>
-    </>
+    <div className="h-screen flex items-center justify-center bg-gray-800">
+      <div className="max-w-2xl w-full">
+        {currentAccount ? (
+          <>
+            <h1>Tips</h1>
+            <div>
+              {tips.map((tip) => (
+                <TipComponent tip={tip} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <button
+            onClick={connectWallet}
+            className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+          >
+            Connect to Wallet
+          </button>
+        )}
+        <button onClick={handleLogOut}>log out</button>
+      </div>
+    </div>
   );
 };
 
