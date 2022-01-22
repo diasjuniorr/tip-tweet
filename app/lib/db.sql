@@ -8,13 +8,15 @@ create table tips (
   created_at timestamp with time zone not null default now(),
   updated_at timestamp with time zone not null default now(),
   deleted_at timestamp with time zone,
+  tweet_url text not null,
   tweet_id text not null,
+  tweet_text text not null,
   nonce text not null,
   amount text not null,
   tweet_owner_id text not null,
   claimed boolean not null default false,
   signature text not null
-  add constraint pk_tips primary key (id)
+  primary key (id)
 );
 
 create policy "Anyone can post a tip."
