@@ -50,13 +50,11 @@ const Tips: NextPage = () => {
       await claimTip.wait();
       console.log("verifySignature: ", claimTip);
 
-      let { data: error } = await supabase
-        .from("tips")
-        .update({id: tip.id ,claimed: true });
+      const updated = await updateTip(tip);
 
-      if (error) {
-        console.log("claimTip failed: ", error);
-        throw new Error("claimTip failed");
+      if (!updated) {
+        console.log("updating tip failed" );
+        throw new Error("updating tip failed");
       }
     } catch (err) {
       console.log(err);
@@ -191,6 +189,20 @@ const Tips: NextPage = () => {
 };
 
 export default Tips;
+
+const updateTip = async (tip: Tip) => {
+  let { data: error } = await supabase
+    .from("tips")
+    .update({ claimed: true })
+    .eq("id", tip.id);
+
+  if (error) {
+    console.log("claimTip failed: ", error);
+    throw new Error("claimTip failed");
+  }
+
+  return true;
+};
 
 const getTips = async () => {
   try {
