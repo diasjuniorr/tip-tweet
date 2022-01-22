@@ -1,8 +1,9 @@
 interface TipProps {
   tip: Tip;
+  claimTip: (tip: Tip) => void;
 }
 
-const TipComponent: React.FC<TipProps> = ({ tip }) => {
+const TipComponent: React.FC<TipProps> = ({ tip, claimTip }) => {
   return (
     <div className="flex flex-row bg-white w-full h-40 items-center rounded-md mb-6">
       <div className="basis-9/12 py-6 px-6 font-semibold">
@@ -18,7 +19,9 @@ const TipComponent: React.FC<TipProps> = ({ tip }) => {
           <p>{tip.amount} eth</p>
         </div>
         <div className="mt-4">
-          <button className="text-lg text-white font-semibold btn-bg-2 py-1 px-3 rounded-md focus:outline-none focus:ring-2 h-12 w-32 transition ease delay-75 hover:-translate-y-1">
+          <button 
+          onClick={() => claimTip(tip)}
+          className="text-lg text-white font-semibold btn-bg-2 py-1 px-3 rounded-md focus:outline-none focus:ring-2 h-12 w-32 transition ease delay-75 hover:-translate-y-1">
             Claim
           </button>
         </div>
