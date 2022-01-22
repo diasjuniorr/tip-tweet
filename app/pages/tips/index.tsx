@@ -28,20 +28,16 @@ const Tips: NextPage = () => {
         throw new Error("No account connected");
       }
 
-      const provider = new ethers.providers.Web3Provider(ethereum)
+      const provider = new ethers.providers.Web3Provider(ethereum);
       // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
       const tipTweetContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
-      )
+      );
 
       const amount = ethers.utils.parseEther(tip.amount);
-
-      
-
-      
 
       const claimTip = await tipTweetContract.claimTip(
         tip.tweet_id,
@@ -54,11 +50,9 @@ const Tips: NextPage = () => {
       await claimTip.wait();
       console.log("verifySignature: ", claimTip);
 
-      let { data:  error } = await supabase
-      .from("tips")
-      .update(
-        {claimed: true}
-      )
+      let { data: error } = await supabase
+        .from("tips")
+        .update({id: tip.id ,claimed: true });
 
       if (error) {
         console.log("claimTip failed: ", error);
