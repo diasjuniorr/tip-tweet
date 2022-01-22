@@ -34,9 +34,7 @@ const Home: NextPage = () => {
       }
 
       //get twitter user id
-      const tweet: Tweet = await http(
-        `/api/v1/tweets/${tweetID}`
-      );
+      const tweet: Tweet = await http(`/api/v1/tweets/${tweetID}`);
       console.log("data", tweet);
 
       const nonce = generateNonce();
@@ -75,7 +73,7 @@ const Home: NextPage = () => {
 
       await tx;
 
-     tweet.url = tweetUrl; 
+      tweet.url = tweetUrl;
 
       //what if saving tip fails?
       const newTip = await postTip(message, signature as string, tweet);
@@ -203,6 +201,7 @@ const Home: NextPage = () => {
                 Tweet URL
               </label>
               <input
+                placeholder="https://twitter.com/username/status/123456789"
                 className="py-2 px-4 rounded-md focus:outline-none focus:ring-2"
                 type="text"
                 id="tweet"
@@ -214,6 +213,7 @@ const Home: NextPage = () => {
                 Tip Amount
               </label>
               <input
+                placeholder="0.00 eth"
                 className="py-2 px-4 rounded-md focus:outline-none focus:ring-2"
                 type="text"
                 id="text"
@@ -263,9 +263,8 @@ const postTip = async (
   const id = uuidv4();
 
   let bigNumberStr = message.ethAmount.toString();
-  let stringBigNumber = parseInt(bigNumberStr)/(1000000000000000000);
+  let stringBigNumber = parseInt(bigNumberStr) / 1000000000000000000;
   const amount = stringBigNumber.toString();
-
 
   try {
     let { data: tip, error } = await supabase
