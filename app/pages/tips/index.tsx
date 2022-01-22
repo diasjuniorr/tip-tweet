@@ -163,7 +163,7 @@ const Tips: NextPage = () => {
   }
 
   return (
-    <div className="min-h-fit flex items-center justify-center bg-gray-800">
+    <div className="min-h-screen flex items-center justify-center bg-gray-800">
       <div className="max-w-2xl w-full">
         {currentAccount ? (
           <>
