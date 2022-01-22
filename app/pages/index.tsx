@@ -71,7 +71,7 @@ const Home: NextPage = () => {
         gasLimit: 300000,
       });
 
-      await tx;
+      await tx.wait();
 
       tweet.url = tweetUrl;
 
