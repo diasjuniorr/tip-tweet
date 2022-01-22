@@ -25,7 +25,7 @@ create policy "Anyone can post a tip."
 
 create policy "Only the owner can update a tip."
   on tips for update 
-  with check ( auth.twitterid() = tweet_owner_id);
+  using ( auth.twitterid() = tweet_owner_id);
 
 create policy "Only tweet owners can get their tips"
   on tips
