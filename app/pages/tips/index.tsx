@@ -48,14 +48,34 @@ const Tips: NextPage = () => {
       );
 
       await claimTip.wait();
-      console.log("verifySignature: ", claimTip);
+      console.log("claimTip: ", claimTip);
 
       const updated = await updateTip(tip);
 
       if (!updated) {
-        console.log("updating tip failed" );
+        console.log("updating tip failed");
         throw new Error("updating tip failed");
       }
+
+      const getTips = async () => {
+        try {
+          let { data: tips, error } = await supabase
+            .from("tips")
+            .select("*")
+            .eq("claimed", false);
+          if (error) {
+            console.log("getTips failed: ", error);
+            throw new Error("getTips failed");
+          }
+
+          return setTips(tips as Tip[]);
+        } catch (e) {
+          console.log("getTips failed: ", e);
+          throw new Error("getTips failed");
+        }
+      };
+
+      getTips();
     } catch (err) {
       console.log(err);
     }
@@ -96,13 +116,16 @@ const Tips: NextPage = () => {
   useEffect(() => {
     const getTips = async () => {
       try {
-        let { data: tips, error } = await supabase.from("tips").select("*");
+        let { data: tips, error } = await supabase
+          .from("tips")
+          .select("*")
+          .eq("claimed", false);
         if (error) {
           console.log("getTips failed: ", error);
           throw new Error("getTips failed");
         }
 
-        return setTips(tips?.filter((tip) => !tip.claimed) as Tip[]);
+        return setTips(tips as Tip[]);
       } catch (e) {
         console.log("getTips failed: ", e);
         throw new Error("getTips failed");
