@@ -6,6 +6,7 @@ import supabase from "../../lib/supabase";
 import abi from "../../contracts/abi/TipTweet.json";
 import { useRouter } from "next/router";
 import TipComponent from "../../components/Tip";
+import LoadingComponent from "../../components/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,6 +20,7 @@ const Tips: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [tips, setTips] = useState<Tip[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isClaiming, setisClaiming] = useState(false);
 
   const router = useRouter();
@@ -112,6 +114,7 @@ const Tips: NextPage = () => {
         }
 
         return setTips(tips as Tip[]);
+        setIsLoading(false);
       } catch (e) {
         console.log("getTips failed: ", e);
         throw new Error("getTips failed");
@@ -165,9 +168,10 @@ const Tips: NextPage = () => {
     checkIfWalletIsConnected();
   }, []);
 
-  if (!user) {
-    // Currently loading asynchronously User Supabase Information
-    return null;
+  if (isLoading) {
+    return (
+      <LoadingComponent/>
+    )
   }
 
   return (
