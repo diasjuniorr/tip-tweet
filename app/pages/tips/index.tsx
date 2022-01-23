@@ -180,12 +180,14 @@ const Tips: NextPage = () => {
             </div>
           </>
         ) : (
-          <button
-            onClick={connectWallet}
-            className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-          >
-            Connect to Wallet
-          </button>
+          <div className="bg-red-500 justify-self-center">
+            <button
+              onClick={connectWallet}
+              className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+            >
+              Connect to Wallet
+            </button>
+          </div>
         )}
       </div>
     </div>
