@@ -57,26 +57,7 @@ const Tips: NextPage = () => {
         throw new Error("updating tip failed");
       }
 
-      const getTips = async () => {
-        try {
-          let { data: tips, error } = await supabase
-            .from("tips")
-            .select("*")
-            .eq("claimed", false);
-          if (error) {
-            console.log("getTips failed: ", error);
-            throw new Error("getTips failed");
-          }
-
-          console.log("getTips")
-          return setTips(tips as Tip[]);
-        } catch (e) {
-          console.log("getTips failed: ", e);
-          throw new Error("getTips failed");
-        }
-      };
-
-      getTips();
+      setTips(tips.filter((t) => t.id !== tip.id));
     } catch (err) {
       console.log(err);
     }
