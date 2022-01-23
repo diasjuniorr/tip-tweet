@@ -6,6 +6,8 @@ import supabase from "../../lib/supabase";
 import abi from "../../contracts/abi/TipTweet.json";
 import { useRouter } from "next/router";
 import TipComponent from "../../components/Tip";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 declare let window: any;
 
@@ -17,6 +19,7 @@ const Tips: NextPage = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [tips, setTips] = useState<Tip[]>([]);
+  const [isClaiming, setisClaiming] = useState(false);
 
   const router = useRouter();
 
@@ -58,7 +61,9 @@ const Tips: NextPage = () => {
       }
 
       setTips(tips.filter((t) => t.id !== tip.id));
+      toast.success("Tip claimed successfully");
     } catch (err) {
+      toast.error("Error claiming tip ");
       console.log(err);
     }
   };
@@ -173,8 +178,8 @@ const Tips: NextPage = () => {
         {currentAccount ? (
           <>
             <h1 className="text-center text-2xl font-bold text-white mb-6">
-              {tips.length>0 ? "Tips to claim" : "No tips to claim"}
-              </h1>
+              {tips.length > 0 ? "Tips to claim" : "No tips to claim"}
+            </h1>
             <div>
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
@@ -191,6 +196,7 @@ const Tips: NextPage = () => {
             </button>
           </div>
         )}
+        <ToastContainer />
       </div>
     </div>
   );
