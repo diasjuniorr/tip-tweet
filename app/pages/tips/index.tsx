@@ -175,11 +175,9 @@ const Tips: NextPage = () => {
         {currentAccount ? (
           <>
             <TipsTitle hasTips={tips.length>0} isLoading={isLoading} />
-            <div>
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
               ))}
-            </div>
           </>
         ) : (
           <div className="flex items-center justify-center">
