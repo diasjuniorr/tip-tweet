@@ -168,20 +168,18 @@ const Tips: NextPage = () => {
     checkIfWalletIsConnected();
   }, []);
 
-  if (isLoading) {
-    return (
-      <LoadingComponent/>
-    )
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-800">
       <div className="max-w-2xl w-full">
         {currentAccount ? (
           <>
-            <h1 className="text-center text-2xl font-bold text-white mb-6">
-              {tips.length > 0 ? "Tips to claim" : "No tips to claim"}
-            </h1>
+            {isLoading ? (
+              <LoadingComponent />
+            ) : (
+              <h1 className="text-center text-2xl font-bold text-white mb-6">
+                {tips.length > 0 ? "Tips to claim" : "No tips to claim"}
+              </h1>
+            )}
             <div>
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
