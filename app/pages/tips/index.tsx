@@ -193,7 +193,7 @@ const Tips: NextPage = () => {
             <h1 className="text-center font-bold text-white">Tips</h1>
             <div>
               {tips.map((tip) => (
-                <TipComponent tip={tip} claimTip={claimTip} />
+                <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
               ))}
             </div>
           </>
@@ -205,7 +205,6 @@ const Tips: NextPage = () => {
             Connect to Wallet
           </button>
         )}
-        {/* <button onClick={handleLogOut}>log out</button> */}
       </div>
     </div>
   );
