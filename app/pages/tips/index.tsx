@@ -55,9 +55,9 @@ const Tips: NextPage = () => {
 
       await claimTip.wait();
 
-      const updated = await updateTip(tip);
+      const updatedTip = await updateTip(tip);
 
-      if (!updated) {
+      if (!updatedTip) {
         console.log("updating tip failed");
         throw new Error("updating tip failed");
       }
