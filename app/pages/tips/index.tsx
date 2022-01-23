@@ -172,7 +172,7 @@ const Tips: NextPage = () => {
       <div className="max-w-2xl w-full">
         {currentAccount ? (
           <>
-            <h1 className="text-center font-bold text-white">Tips</h1>
+            <h1 className="text-center font-bold text-white mb-6">Tips</h1>
             <div>
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
@@ -180,7 +180,7 @@ const Tips: NextPage = () => {
             </div>
           </>
         ) : (
-          <div className="bg-red-500 justify-self-center">
+          <div className="flex items-center justify-center">
             <button
               onClick={connectWallet}
               className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
