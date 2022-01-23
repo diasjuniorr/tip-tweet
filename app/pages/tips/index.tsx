@@ -195,7 +195,7 @@ const Tips: NextPage = () => {
 export default Tips;
 
 const updateTip = async (tip: Tip) => {
-  let { data: error } = await supabase
+  let { data: updatedTip, error } = await supabase
     .from("tips")
     .update({ claimed: true })
     .eq("id", tip.id);
