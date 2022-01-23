@@ -15,7 +15,7 @@ const TipComponent: React.FC<TipProps> = ({ tip, claimTip }) => {
         </div>
       </div>
       <div className="flex flex-col basis-3/12 items-center justify-between">
-        <div className="text-center text-lg font-semibold">
+        <div className="text-center text-lg font-light">
           <p>{tip.amount} eth</p>
         </div>
         <div className="mt-4">
