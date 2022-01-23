@@ -9,6 +9,7 @@ import TipComponent from "../../components/Tip";
 import LoadingComponent from "../../components/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TipsTitle from "../../components/TipsTitle";
 
 declare let window: any;
 
@@ -113,8 +114,8 @@ const Tips: NextPage = () => {
           throw new Error("getTips failed");
         }
 
-        return setTips(tips as Tip[]);
         setIsLoading(false);
+        return setTips(tips as Tip[]);
       } catch (e) {
         console.log("getTips failed: ", e);
         throw new Error("getTips failed");
@@ -173,13 +174,7 @@ const Tips: NextPage = () => {
       <div className="max-w-2xl w-full">
         {currentAccount ? (
           <>
-            {isLoading ? (
-              <LoadingComponent />
-            ) : (
-              <h1 className="text-center text-2xl font-bold text-white mb-6">
-                {tips.length > 0 ? "Tips to claim" : "No tips to claim"}
-              </h1>
-            )}
+            <TipsTitle hasTips={tips.length>0} isLoading={isLoading} />
             <div>
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
