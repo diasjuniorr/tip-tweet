@@ -34,20 +34,19 @@ const Home: NextPage = () => {
         alert("Invalid tweet URL");
         throw new Error("Invalid tweet URL");
       }
-      
+
       //get twitter user id
       const tweet: Tweet = await http(`/api/v1/tweets/${tweetID}`);
-      console.log("data", tweet);
-      
+
       const nonce = generateNonce();
       const ethAmount = ethers.utils.parseEther(tipAmount.replaceAll(",", "."));
-      
+
       const { ethereum } = window;
-      
+
       if (!currentAccount) {
         throw new Error("No account connected");
       }
-      
+
       const provider = new ethers.providers.Web3Provider(ethereum);
       // const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
@@ -55,108 +54,106 @@ const Home: NextPage = () => {
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
-        );
-        
-        //
-        const message = makeNewMessage(
-          ethAmount,
-          tweetID,
-          nonce,
-          CONTRACT_ADDRESS
-          );
-          
-          console.log("message", message);
-          const signature = await signMessage(message);
-          
-          const tx = await tipTweetContract.tipTweet(signature, {
-            value: ethAmount,
-            gasLimit: 300000,
-          });
-          
-          await tx.wait();
-          
-          tweet.url = tweetUrl;
-          
-          //what if saving tip fails?
-          const newTip = await postTip(message, signature as string, tweet);
-          console.log("newTip", newTip);
-          
-          setIsMiningTx(false);
-          toast.success("Tip processed")
-          return;
-        } catch (e) {
-          setIsMiningTx(false);
-          toast.error("Tip processing failed...")
-          throw new Error("Attempt to tip tweet failed");
-        }
+      );
+
+      //
+      const message = makeNewMessage(
+        ethAmount,
+        tweetID,
+        nonce,
+        CONTRACT_ADDRESS
+      );
+
+      const signature = await signMessage(message);
+
+      const tx = await tipTweetContract.tipTweet(signature, {
+        value: ethAmount,
+        gasLimit: 300000,
+      });
+
+      await tx.wait();
+
+      tweet.url = tweetUrl;
+
+      //what if saving tip fails?
+      const newTip = await postTip(message, signature as string, tweet);
+
+      setIsMiningTx(false);
+      toast.success("Tip processed");
+      return;
+    } catch (e) {
+      setIsMiningTx(false);
+      toast.error("Tip processing failed...");
+      throw new Error("Attempt to tip tweet failed");
+    }
+  }
+
+  const signMessage = async (message: Message) => {
+    const { ethAmount, tweetID, nonce, contractAddress } = message;
+    try {
+      if (!currentAccount) {
+        throw new Error("No account connected");
       }
-      
-      const signMessage = async (message: Message) => {
-        const { ethAmount, tweetID, nonce, contractAddress } = message;
-        try {
-          if (!currentAccount) {
-            throw new Error("No account connected");
-          }
-          const { ethereum } = window;
-          const provider = new ethers.providers.Web3Provider(ethereum);
-          // const provider = new ethers.providers.JsonRpcProvider();
-          const signer = provider.getSigner();
-          const messageHashed = ethers.utils.solidityKeccak256(
-            ["string", "uint256", "string", "address"],
-            [tweetID, ethAmount, nonce, contractAddress]
-            );
-            
-            const signature = await signer.signMessage(
-              ethers.utils.arrayify(messageHashed)
-              );
-              return signature;
-            } catch (err) {
-              console.log(err);
-              throw new Error("Could not sign message");
-            }
-          };
-          
-          const checkIfWalletIsConnected = async () => {
-            const { ethereum } = window;
-            
-            if (!ethereum) {
-              console.log("Make sure you have metamask!");
-              return;
-            } else {
-              console.log("We have the ethereum object", ethereum);
-            }
-            
-            const accounts = await ethereum.request({ method: "eth_accounts" });
-            
-            if (accounts.length !== 0) {
-              const account = accounts[0];
-              console.log("Found an authorized account:", account);
-              setCurrentAccount(account);
-            } else {
-              console.log("No authorized account found");
-            }
-          };
-          
-          const connectWallet = async () => {
-            try {
-              const { ethereum } = window;
-              
-              if (!ethereum) {
-                alert("Get MetaMask!");
-                return;
-              }
-              
-              const accounts = await ethereum.request({
-                method: "eth_requestAccounts",
-              });
-              
-              console.log("Connected", accounts[0]);
-              setCurrentAccount(accounts[0]);
-            } catch (error) {
-              console.log(error);
-            }
-          };
-          
+      const { ethereum } = window;
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      // const provider = new ethers.providers.JsonRpcProvider();
+      const signer = provider.getSigner();
+      const messageHashed = ethers.utils.solidityKeccak256(
+        ["string", "uint256", "string", "address"],
+        [tweetID, ethAmount, nonce, contractAddress]
+      );
+
+      const signature = await signer.signMessage(
+        ethers.utils.arrayify(messageHashed)
+      );
+      return signature;
+    } catch (err) {
+      console.log(err);
+      throw new Error("Could not sign message");
+    }
+  };
+
+  const checkIfWalletIsConnected = async () => {
+    const { ethereum } = window;
+
+    if (!ethereum) {
+      alert("Make sure you have metamask!");
+      return;
+    } else {
+      console.log("We have the ethereum object", ethereum);
+    }
+
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+
+    if (accounts.length !== 0) {
+      const account = accounts[0];
+      console.log("Found an authorized account:", account);
+      setCurrentAccount(account);
+    } else {
+      console.log("No authorized account found");
+    }
+  };
+
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        alert("Get MetaMask!");
+        return;
+      }
+
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      console.log("Connected", accounts[0]);
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleLogOut: MouseEventHandler = async (e) => {
     e.preventDefault();
 
@@ -175,7 +172,6 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const session = supabase.auth.session();
-    console.log("session", session);
   }),
     [];
 
