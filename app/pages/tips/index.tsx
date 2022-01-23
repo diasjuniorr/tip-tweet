@@ -68,7 +68,7 @@ const Tips: NextPage = () => {
             throw new Error("getTips failed");
           }
 
-          console.log("getTips updated: ", tips);
+          console.log("getTips")
           return setTips(tips as Tip[]);
         } catch (e) {
           console.log("getTips failed: ", e);
@@ -192,7 +192,6 @@ const Tips: NextPage = () => {
         {currentAccount ? (
           <>
             <h1 className="text-center font-bold text-white">Tips</h1>
-            {JSON.stringify(tips, null, 2)}
             <div>
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
