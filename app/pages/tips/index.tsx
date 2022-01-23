@@ -68,6 +68,7 @@ const Tips: NextPage = () => {
             throw new Error("getTips failed");
           }
 
+          console.log("getTips updated: ", tips);
           return setTips(tips as Tip[]);
         } catch (e) {
           console.log("getTips failed: ", e);
