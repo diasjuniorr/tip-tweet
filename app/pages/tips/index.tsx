@@ -51,7 +51,6 @@ const Tips: NextPage = () => {
       );
 
       await claimTip.wait();
-      console.log("claimTip: ", claimTip);
 
       const updated = await updateTip(tip);
 
@@ -126,7 +125,7 @@ const Tips: NextPage = () => {
     const { ethereum } = window;
 
     if (!ethereum) {
-      console.log("Make sure you have metamask!");
+      alert("Make sure you have metamask!");
       return;
     } else {
       console.log("We have the ethereum object", ethereum);
@@ -156,7 +155,6 @@ const Tips: NextPage = () => {
         method: "eth_requestAccounts",
       });
 
-      console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.log(error);
