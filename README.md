@@ -4,7 +4,8 @@
 
 - [About](#about)
 - [Folder Structure](#folder_structure)
-- [Getting Started](#getting_started)
+- [Contract Deveopment](#contract_deveopment)
+- [Starting the App](#getting_started)
 - [Usage](#usage)
 - [Contributing](../CONTRIBUTING.md)
 
@@ -15,27 +16,57 @@ Tip Tweet is hybrid dApp that allows users to tip a tweet with crypto currency w
 ## Folder structure <a name = "folder_structure"></a>
 
 - root: contains the smart contract development environment. It uses [Hardhat](https://hardhat.org/).
-- app: contains the front-end code developed with [Next.js](https://nextjs.org/) and [Supabase](https://supabase.io/).
-## Getting Started <a name = "getting_started"></a>
+- app: contains the app to interact with the contract developed with [Next.js](https://nextjs.org/) and [Supabase](https://supabase.io/).
 
-Clone the repo and install the dependencies with your preferred manager.
+## Contract Development <a name = "contract_development"></a>
 
- To install the dependencies for the smart contract development environment, run:
+The root directory contains the smart contract development environment. It uses [Hardhat](https://hardhat.org/). as mentioned above.
+To set up the development environment, run the following command in the root directory:
 ```bash
 npm install
 ## or
 yarn
 ```
 
- To install the dependencies for the app code, run:
+Now you can compile, test and deploy the contract.
+
+### Compiling the contract
+in the root directory, run the following command:
 ```bash
-cd app
+npx hardhat compile
+```
+
+### Testing the contract
+in the root directory, run the following command:
+```bash
+npx hardhat test
+```
+
+### Deploying the contract
+in the root directory, run the following command:
+```bash
+npx hardhat run scripts/deploy.ts --network <network>
+```
+
+### Copying contract ABI to the app
+Every time you compile a new version of the contract you will need to provide the ABI of the contract to the app.
+To do so, run the following command in the root directory:
+```bash
+make abi
+```
+
+## Starting the App <a name = ""></a>
+
+To start the app to interact with the contract on the blockchain, you need to `cd app` and run the following command:
+
+To install the dependencies, run:
+```bash
 npm install
 ## or
 yarn
 ```
 
- To run the app locally, run:
+ To start it:
 ```bash
 npm run dev
 ## or
