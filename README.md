@@ -35,19 +35,16 @@ in the root directory, run the following command:
 ```bash
 npx hardhat compile
 ```
-
 ### Testing the contract
 in the root directory, run the following command:
 ```bash
 npx hardhat test
 ```
-
 ### Deploying the contract
 in the root directory, run the following command:
 ```bash
 npx hardhat run scripts/deploy.ts --network <network>
 ```
-
 ### Copying contract ABI to the app
 Every time you compile a new version of the contract you will need to provide the ABI of the contract to the app.
 To do so, run the following command in the root directory:
