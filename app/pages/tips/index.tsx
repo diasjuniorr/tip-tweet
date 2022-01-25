@@ -100,7 +100,7 @@ const Tips: NextPage = () => {
     };
 
     getProfile();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const getTips = async () => {
