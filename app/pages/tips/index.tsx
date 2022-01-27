@@ -175,7 +175,7 @@ const Tips: NextPage = () => {
       <div className="flex fixed h-28 justify-center items-center">
         <div className="p-12">
           <Link href={"/"}>
-            <a className="text-4xl text-gradient-color">Tip Tweet</a>
+            <a className="text-4xl font-bold text-gradient-color">Tip Tweet</a>
           </Link>
         </div>
       </div>
