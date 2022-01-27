@@ -10,6 +10,7 @@ import LoadingComponent from "../../components/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TipsTitle from "../../components/TipsTitle";
+import Link from "next/link";
 
 declare let window: any;
 
@@ -170,28 +171,37 @@ const Tips: NextPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-800">
-      <div className="max-w-2xl w-full">
-        {currentAccount ? (
-          <>
-            <TipsTitle hasTips={tips.length>0} isLoading={isLoading} />
+    <>
+      <div className="flex fixed h-28 justify-center items-center">
+        <div className="p-12">
+          <Link href={"/"}>
+            <a className="text-4xl text-gradient-color">Tip Tweet</a>
+          </Link>
+        </div>
+      </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-800">
+        <div className="max-w-2xl w-full">
+          {currentAccount ? (
+            <>
+              <TipsTitle hasTips={tips.length > 0} isLoading={isLoading} />
               {tips.map((tip) => (
                 <TipComponent key={tip.id} tip={tip} claimTip={claimTip} />
               ))}
-          </>
-        ) : (
-          <div className="flex items-center justify-center">
-            <button
-              onClick={connectWallet}
-              className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-            >
-              Connect to Wallet
-            </button>
-          </div>
-        )}
-        <ToastContainer />
+            </>
+          ) : (
+            <div className="flex items-center justify-center">
+              <button
+                onClick={connectWallet}
+                className="mt-10 text-lg text-white font-semibold btn-bg py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+              >
+                Connect to Wallet
+              </button>
+            </div>
+          )}
+          <ToastContainer />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

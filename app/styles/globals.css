@@ -19,6 +19,12 @@ a {
   box-sizing: border-box;
 }
 
+.text-gradient-color {
+  background: -webkit-linear-gradient(left, #60c657, #35aee2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .btn-bg {
   background: -webkit-linear-gradient(left, #60c657, #35aee2);
   background-size: 200% 200%;
