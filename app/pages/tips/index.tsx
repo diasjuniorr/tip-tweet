@@ -83,48 +83,48 @@ const Tips: NextPage = () => {
     return router.push("/");
   };
 
-  useEffect(() => {
-    const getProfile = async () => {
-      const profile = supabase.auth.user();
+  // useEffect(() => {
+  //   const getProfile = async () => {
+  //     const profile = supabase.auth.user();
 
-      if (!profile) {
-        return await supabase.auth.signIn(
-          {
-            provider: "twitter",
-          },
-          {
-            redirectTo: "https://tip-tweet.vercel.app/tips",
-          }
-        );
-      }
-      setUser(profile);
-    };
+  //     if (!profile) {
+  //       return await supabase.auth.signIn(
+  //         {
+  //           provider: "twitter",
+  //         },
+  //         {
+  //           redirectTo: "https://tip-tweet.vercel.app/tips",
+  //         }
+  //       );
+  //     }
+  //     setUser(profile);
+  //   };
 
-    getProfile();
-  }, [user]);
+  //   getProfile();
+  // }, [user]);
 
-  useEffect(() => {
-    const getTips = async () => {
-      try {
-        let { data: tips, error } = await supabase
-          .from("tips")
-          .select("*")
-          .eq("claimed", false);
-        if (error) {
-          console.log("getTips failed: ", error);
-          throw new Error("getTips failed");
-        }
+  // useEffect(() => {
+  //   const getTips = async () => {
+  //     try {
+  //       let { data: tips, error } = await supabase
+  //         .from("tips")
+  //         .select("*")
+  //         .eq("claimed", false);
+  //       if (error) {
+  //         console.log("getTips failed: ", error);
+  //         throw new Error("getTips failed");
+  //       }
 
-        setIsLoading(false);
-        return setTips(tips as Tip[]);
-      } catch (e) {
-        console.log("getTips failed: ", e);
-        throw new Error("getTips failed");
-      }
-    };
+  //       setIsLoading(false);
+  //       return setTips(tips as Tip[]);
+  //     } catch (e) {
+  //       console.log("getTips failed: ", e);
+  //       throw new Error("getTips failed");
+  //     }
+  //   };
 
-    getTips();
-  }, [user]);
+  //   getTips();
+  // }, [user]);
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -172,13 +172,6 @@ const Tips: NextPage = () => {
 
   return (
     <>
-      <div className="flex fixed h-28 justify-center items-center">
-        <div className="p-12">
-          <Link href={"/"}>
-            <a className="text-4xl font-bold text-gradient-color">Tip Tweet</a>
-          </Link>
-        </div>
-      </div>
       <div className="min-h-screen flex items-center justify-center bg-gray-800">
         <div className="max-w-2xl w-full">
           {currentAccount ? (
