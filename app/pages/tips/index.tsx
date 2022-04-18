@@ -103,28 +103,28 @@ const Tips: NextPage = () => {
   //   getProfile();
   // }, [user]);
 
-  // useEffect(() => {
-  //   const getTips = async () => {
-  //     try {
-  //       let { data: tips, error } = await supabase
-  //         .from("tips")
-  //         .select("*")
-  //         .eq("claimed", false);
-  //       if (error) {
-  //         console.log("getTips failed: ", error);
-  //         throw new Error("getTips failed");
-  //       }
+  useEffect(() => {
+    const getTips = async () => {
+      try {
+        let { data: tips, error } = await supabase
+          .from("tips")
+          .select("*")
+          .eq("claimed", false);
+        if (error) {
+          console.log("getTips failed: ", error);
+          throw new Error("getTips failed");
+        }
 
-  //       setIsLoading(false);
-  //       return setTips(tips as Tip[]);
-  //     } catch (e) {
-  //       console.log("getTips failed: ", e);
-  //       throw new Error("getTips failed");
-  //     }
-  //   };
+        setIsLoading(false);
+        return setTips(tips as Tip[]);
+      } catch (e) {
+        console.log("getTips failed: ", e);
+        throw new Error("getTips failed");
+      }
+    };
 
-  //   getTips();
-  // }, [user]);
+    getTips();
+  }, [user]);
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
